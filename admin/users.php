@@ -1,4 +1,22 @@
-﻿<!DOCTYPE html>
+﻿<?php
+require_once '../config/db.php';
+session_start();
+
+// Check if user is admin
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+    header("Location: ../login.php");
+    exit;
+}
+
+// Fetch Users
+try {
+    $stmt = $pdo->query("SELECT id, name, email, created_at, is_admin FROM users ORDER BY created_at DESC");
+    $users = $stmt->fetchAll();
+} catch (PDOException $e) {
+    $error = "Error loading users.";
+}
+?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -77,6 +95,13 @@
                     <h1 class="h2">Manage Users</h1>
                 </div>
 
+                <?php if (isset($_GET['success'])): ?>
+                    <div class="alert alert-success"><?php echo htmlspecialchars($_GET['success']); ?></div>
+                <?php endif; ?>
+                <?php if (isset($_GET['error'])): ?>
+                    <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['error']); ?></div>
+                <?php endif; ?>
+
                 <!-- Users Table -->
                 <div class="card">
                     <div class="card-header">
@@ -91,11 +116,39 @@
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Role</th>
+                                        <th>Joined</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="admin-users-table">
-                                    <!-- Users will be loaded here -->
+                                <tbody>
+                                    <?php foreach ($users as $user): ?>
+                                    <tr>
+                                        <td><?php echo $user['id']; ?></td>
+                                        <td><?php echo htmlspecialchars($user['name']); ?></td>
+                                        <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                        <td>
+                                            <?php if ($user['is_admin']): ?>
+                                                <span class="badge bg-danger">Admin</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-secondary">Customer</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
+                                        <td>
+                                            <?php if (!$user['is_admin']): ?>
+                                                <form action="user_actions.php" method="POST" onsubmit="return confirm('Are you sure you want to delete this user? This will also delete their orders.');">
+                                                    <input type="hidden" name="action" value="delete">
+                                                    <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </button>
+                                                </form>
+                                            <?php else: ?>
+                                                <span class="text-muted">Protected</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
@@ -141,9 +194,5 @@
     </script>
     <!-- Custom JS -->
     <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/auth.js"></script>
-    <script src="../assets/js/admin.js"></script>
 </body>
 </html>
-
-

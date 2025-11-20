@@ -1,282 +1,182 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - Computer Store</title>
+﻿<?php
+require_once 'config/db.php';
+$pageTitle = 'Checkout - Computer Store';
+include 'includes/header.php';
+include 'includes/navbar.php';
+
+if (!isset($_SESSION['user_id'])) {
+    echo '<script>window.location.href = "login.php";</script>';
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+$cart_items = [];
+$total = 0;
+
+// Fetch cart items
+try {
+    $stmt = $pdo->prepare("
+        SELECT c.quantity, p.id as product_id, p.name, p.price, p.stock 
+        FROM cart c 
+        JOIN products p ON c.product_id = p.id 
+        WHERE c.user_id = ?
+    ");
+    $stmt->execute([$user_id]);
+    $cart_items = $stmt->fetchAll();
+
+    if (empty($cart_items)) {
+        echo '<script>window.location.href = "cart.php";</script>';
+        exit;
+    }
+
+    foreach ($cart_items as $item) {
+        $total += $item['price'] * $item['quantity'];
+    }
+} catch (PDOException $e) {
+    $error = "Error loading cart.";
+}
+
+// Handle Order Placement
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $shipping_name = $_POST['shipping_name'];
+    $shipping_phone = $_POST['shipping_phone'];
+    $shipping_address = $_POST['shipping_address'];
+    $shipping_city = $_POST['shipping_city'];
+    $shipping_zip = $_POST['shipping_zip'];
+    $payment_method = $_POST['payment_method'];
+
+    try {
+        $pdo->beginTransaction();
+
+        // 1. Create Order
+        $stmt = $pdo->prepare("
+            INSERT INTO orders (user_id, total_price, shipping_name, shipping_address, shipping_city, shipping_zip, shipping_phone, payment_method) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $user_id, 
+            $total * 1.10, // Total with tax
+            $shipping_name,
+            $shipping_address,
+            $shipping_city,
+            $shipping_zip,
+            $shipping_phone,
+            $payment_method
+        ]);
+        $order_id = $pdo->lastInsertId();
+
+        // 2. Create Order Items & Update Stock
+        $stmt_item = $pdo->prepare("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
+        $stmt_stock = $pdo->prepare("UPDATE products SET stock = stock - ? WHERE id = ?");
+
+        foreach ($cart_items as $item) {
+            $stmt_item->execute([$order_id, $item['product_id'], $item['quantity'], $item['price']]);
+            $stmt_stock->execute([$item['quantity'], $item['product_id']]);
+        }
+
+        // 3. Clear Cart
+        $stmt = $pdo->prepare("DELETE FROM cart WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+
+        $pdo->commit();
+        echo '<script>window.location.href = "order-history.php?success=1";</script>';
+        exit;
+
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        $error = "Order failed: " . $e->getMessage();
+    }
+}
+?>
+
+<main class="container my-5">
+    <h2 class="mb-4">Checkout</h2>
     
-    <!-- Bootstrap CSS -->
-    <link href="assets/bootstrap/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
-    <header>
-        <!-- Navigation -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <i class="fas fa-desktop"></i> Computer Store
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="products.php">Products</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item d-flex align-items-center">
-                        <div class="btn-group" role="group" aria-label="Theme switcher">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-theme-value="light">Light</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-theme-value="dark">Dark</button>
+    <?php if (isset($error)): ?>
+        <div class="alert alert-danger"><?php echo $error; ?></div>
+    <?php endif; ?>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Shipping Information</h5>
+                </div>
+                <div class="card-body">
+                    <form id="checkout-form" method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="shipping-name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="shipping-name" name="shipping_name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="shipping-phone" class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="shipping-phone" name="shipping_phone" required>
+                            </div>
                         </div>
-                    </li>
-                    <li class="nav-item dropdown" id="nav-user-menu" style="display: none;">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user"></i> <span class="nav-user-name"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="order-history.php">Order History</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="cart.php">
-                            <i class="fas fa-shopping-cart"></i> Cart
-                            <span class="cart-count badge bg-danger" style="display: none;">0</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        </nav>
-    </header>
-
-    <!-- Main Content -->
-    <main class="container my-5">
-        <h2 class="mb-4">Checkout</h2>
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>Shipping Information</h5>
-                    </div>
-                    <div class="card-body">
-                        <form id="checkout-form" method="POST" onsubmit="handleCheckout(event)">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="shipping-name" class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" id="shipping-name" name="shipping_name" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="shipping-phone" class="form-label">Phone</label>
-                                    <input type="tel" class="form-control" id="shipping-phone" name="shipping_phone" required>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="shipping-address" class="form-label">Address</label>
-                                <input type="text" class="form-control" id="shipping-address" name="shipping_address" required>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="shipping-city" class="form-label">City</label>
-                                    <input type="text" class="form-control" id="shipping-city" name="shipping_city" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="shipping-zip" class="form-label">ZIP Code</label>
-                                    <input type="text" class="form-control" id="shipping-zip" name="shipping_zip" required>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="payment-method" class="form-label">Payment Method</label>
-                                <select class="form-select" id="payment-method" name="payment_method" required>
-                                    <option value="">Select payment method</option>
-                                    <option value="credit-card">Credit Card</option>
-                                    <option value="debit-card">Debit Card</option>
-                                    <option value="paypal">PayPal</option>
-                                    <option value="cash-on-delivery">Cash on Delivery</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-lg w-100">Place Order</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Order Summary</h5>
-                    </div>
-                    <div class="card-body" id="checkout-summary">
-                        <!-- Order summary will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container text-center py-3">
-            <p>&copy; 2024 Computer Store. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Bootstrap JS -->
-    <script src="assets/bootstrap/bootstrap.bundle.min.js"></script>
-    <!-- Dark Mode Toggle -->
-    <script src="assets/js/darkmodetoggle.js"></script>
-    <script>
-        // Update button states based on current theme
-        document.addEventListener('DOMContentLoaded', function() {
-            const updateButtonStates = () => {
-                const currentTheme = document.documentElement.getAttribute('data-bs-theme');
-                const lightBtn = document.querySelector('[data-bs-theme-value="light"]');
-                const darkBtn = document.querySelector('[data-bs-theme-value="dark"]');
-                
-                if (lightBtn && darkBtn) {
-                    if (currentTheme === 'dark') {
-                        lightBtn.classList.remove('active');
-                        darkBtn.classList.add('active');
-                    } else {
-                        lightBtn.classList.add('active');
-                        darkBtn.classList.remove('active');
-                    }
-                }
-            };
-            
-            // Update on load
-            updateButtonStates();
-            
-            // Update when theme changes
-            const observer = new MutationObserver(updateButtonStates);
-            observer.observe(document.documentElement, {
-                attributes: true,
-                attributeFilter: ['data-bs-theme']
-            });
-        });
-    </script>
-    <!-- Custom JS -->
-    <script src="assets/js/main.js"></script>
-    <script src="assets/js/auth.js"></script>
-    <script src="assets/js/cart.js"></script>
-    <script>
-        // Display checkout summary
-        function displayCheckoutSummary() {
-            const cartItems = getCartItemsWithDetails();
-            const subtotal = calculateCartTotal();
-            const tax = subtotal * 0.1;
-            const total = subtotal + tax;
-
-            const summaryContainer = document.getElementById('checkout-summary');
-            if (!summaryContainer) return;
-
-            summaryContainer.innerHTML = `
-                <div id="checkout-items">
-                    ${cartItems.map(item => `
-                        <div class="d-flex justify-content-between mb-2">
-                            <div>
-                                <strong>${item.product.name}</strong>
-                                <br>
-                                <small class="text-muted">Qty: ${item.quantity} x ${formatCurrency(item.product.price)}</small>
-                            </div>
-                            <div>${formatCurrency(item.product.price * item.quantity)}</div>
+                        <div class="mb-3">
+                            <label for="shipping-address" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="shipping-address" name="shipping_address" required>
                         </div>
-                    `).join('')}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="shipping-city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="shipping-city" name="shipping_city" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="shipping-zip" class="form-label">ZIP Code</label>
+                                <input type="text" class="form-control" id="shipping-zip" name="shipping_zip" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="payment-method" class="form-label">Payment Method</label>
+                            <select class="form-select" id="payment-method" name="payment_method" required>
+                                <option value="">Select payment method</option>
+                                <option value="credit-card">Credit Card</option>
+                                <option value="debit-card">Debit Card</option>
+                                <option value="paypal">PayPal</option>
+                                <option value="cash-on-delivery">Cash on Delivery</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Place Order</button>
+                    </form>
                 </div>
-                <hr>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Subtotal:</span>
-                    <span>${formatCurrency(subtotal)}</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Order Summary</h5>
                 </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Tax (10%):</span>
-                    <span>${formatCurrency(tax)}</span>
+                <div class="card-body">
+                    <?php foreach ($cart_items as $item): ?>
+                    <div class="d-flex justify-content-between mb-2">
+                        <div>
+                            <strong><?php echo htmlspecialchars($item['name']); ?></strong>
+                            <br>
+                            <small class="text-muted">Qty: <?php echo $item['quantity']; ?> x $<?php echo number_format($item['price'], 2); ?></small>
+                        </div>
+                        <div>$<?php echo number_format($item['price'] * $item['quantity'], 2); ?></div>
+                    </div>
+                    <?php endforeach; ?>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>$<?php echo number_format($total, 2); ?></span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax (10%):</span>
+                        <span>$<?php echo number_format($total * 0.10, 2); ?></span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong class="text-primary">$<?php echo number_format($total * 1.10, 2); ?></strong>
+                    </div>
                 </div>
-                <hr>
-                <div class="d-flex justify-content-between mb-3">
-                    <strong>Total:</strong>
-                    <strong class="text-primary">${formatCurrency(total)}</strong>
-                </div>
-            `;
-        }
+            </div>
+        </div>
+    </div>
+</main>
 
-        // Handle checkout
-        function handleCheckout(event) {
-            event.preventDefault();
-            
-            if (!requireLogin()) return;
-
-            const cartItems = getCartItemsWithDetails();
-            if (cartItems.length === 0) {
-                showToast('Your cart is empty', 'warning');
-                redirectTo('cart.php');
-                return;
-            }
-
-            const currentUser = getCurrentUser();
-            const subtotal = calculateCartTotal();
-            const tax = subtotal * 0.1;
-            const total = subtotal + tax;
-
-            // Create order
-            const orders = getOrders();
-            const newOrder = {
-                id: getNextId(orders),
-                user_id: currentUser.id,
-                total_price: total,
-                order_date: new Date().toISOString(),
-                items: cartItems.map(item => ({
-                    product_id: item.product_id,
-                    quantity: item.quantity,
-                    price: item.product.price
-                })),
-                shipping_info: {
-                    name: document.getElementById('shipping-name').value,
-                    phone: document.getElementById('shipping-phone').value,
-                    address: document.getElementById('shipping-address').value,
-                    city: document.getElementById('shipping-city').value,
-                    zip: document.getElementById('shipping-zip').value
-                },
-                payment_method: document.getElementById('payment-method').value
-            };
-
-            orders.push(newOrder);
-            saveOrders(orders);
-
-            // Clear cart
-            clearCart();
-
-            showToast('Order placed successfully!', 'success');
-            setTimeout(() => {
-                redirectTo('order-history.php');
-            }, 1500);
-        }
-
-        // Initialize checkout page
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!requireLogin()) return;
-
-            const cartItems = getCartItemsWithDetails();
-            if (cartItems.length === 0) {
-                showToast('Your cart is empty', 'warning');
-                redirectTo('cart.php');
-                return;
-            }
-
-            displayCheckoutSummary();
-        });
-    </script>
-</body>
-</html>
-
-
+<?php include 'includes/footer.php'; ?>

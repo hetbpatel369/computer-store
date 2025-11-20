@@ -1,134 +1,111 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart - Computer Store</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="assets/bootstrap/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
-    <header>
-        <!-- Navigation -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <i class="fas fa-desktop"></i> Computer Store
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="products.php">Products</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item d-flex align-items-center">
-                        <div class="btn-group" role="group" aria-label="Theme switcher">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-theme-value="light">Light</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-theme-value="dark">Dark</button>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown" id="nav-user-menu" style="display: none;">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user"></i> <span class="nav-user-name"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="order-history.php">Order History</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="cart.php">
-                            <i class="fas fa-shopping-cart"></i> Cart
-                            <span class="cart-count badge bg-danger" style="display: none;">0</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" id="nav-admin-link" style="display: none;">
-                        <a class="nav-link" href="admin/index.php">
-                            <i class="fas fa-cog"></i> Admin
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        </nav>
-    </header>
+﻿<?php
+require_once 'config/db.php';
+$pageTitle = 'Shopping Cart - Computer Store';
+include 'includes/header.php';
+include 'includes/navbar.php';
 
-    <!-- Main Content -->
-    <main class="container my-5">
-        <h2 class="mb-4">Shopping Cart</h2>
+if (!isset($_SESSION['user_id'])) {
+    echo '<script>window.location.href = "login.php";</script>';
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+$cart_items = [];
+$total = 0;
+
+try {
+    $stmt = $pdo->prepare("
+        SELECT c.id as cart_id, c.quantity, p.id as product_id, p.name, p.price, p.image_url, p.stock 
+        FROM cart c 
+        JOIN products p ON c.product_id = p.id 
+        WHERE c.user_id = ?
+    ");
+    $stmt->execute([$user_id]);
+    $cart_items = $stmt->fetchAll();
+} catch (PDOException $e) {
+    $error = "Error loading cart.";
+}
+?>
+
+<main class="container my-5">
+    <h2 class="mb-4">Shopping Cart</h2>
+
+    <?php if (empty($cart_items)): ?>
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+            <h4>Your cart is empty</h4>
+            <p class="text-muted">Add some products to get started!</p>
+            <a href="products.php" class="btn btn-primary">Browse Products</a>
+        </div>
+    <?php else: ?>
         <div class="row">
             <div class="col-md-8">
-                <div id="cart-items">
-                    <!-- Cart items will be loaded here -->
+                <?php foreach ($cart_items as $item): 
+                    $subtotal = $item['price'] * $item['quantity'];
+                    $total += $subtotal;
+                ?>
+                <div class="card mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-2">
+                            <img src="<?php echo htmlspecialchars($item['image_url']); ?>" class="img-fluid rounded-start" alt="<?php echo htmlspecialchars($item['name']); ?>" style="height: 150px; width: 100%; object-fit: cover;" onerror="this.src='https://via.placeholder.com/150'">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title"><?php echo htmlspecialchars($item['name']); ?></h5>
+                                <p class="card-text text-muted">$<?php echo number_format($item['price'], 2); ?> each</p>
+                                
+                                <form action="cart_actions.php" method="POST" class="d-flex align-items-center">
+                                    <input type="hidden" name="action" value="update">
+                                    <input type="hidden" name="cart_id" value="<?php echo $item['cart_id']; ?>">
+                                    <label class="me-2">Quantity:</label>
+                                    <input type="number" name="quantity" class="form-control" value="<?php echo $item['quantity']; ?>" min="1" max="<?php echo $item['stock']; ?>" style="width: 80px;" onchange="this.form.submit()">
+                                    <span class="ms-3 text-muted">Stock: <?php echo $item['stock']; ?></span>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="card-body d-flex flex-column justify-content-between h-100">
+                                <form action="cart_actions.php" method="POST">
+                                    <input type="hidden" name="action" value="remove">
+                                    <input type="hidden" name="cart_id" value="<?php echo $item['cart_id']; ?>">
+                                    <button type="submit" class="btn btn-danger btn-sm w-100">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </button>
+                                </form>
+                                <div class="mt-auto text-end">
+                                    <strong class="text-primary">$<?php echo number_format($subtotal, 2); ?></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <?php endforeach; ?>
             </div>
+
             <div class="col-md-4">
-                <div id="cart-summary">
-                    <!-- Cart summary will be loaded here -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Order Summary</h5>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span>$<?php echo number_format($total, 2); ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tax (10%):</span>
+                            <span>$<?php echo number_format($total * 0.10, 2); ?></span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <strong>Total:</strong>
+                            <strong class="text-primary">$<?php echo number_format($total * 1.10, 2); ?></strong>
+                        </div>
+                        <a href="checkout.php" class="btn btn-primary w-100">Proceed to Checkout</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </main>
+    <?php endif; ?>
+</main>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container text-center py-3">
-            <p>&copy; 2024 Computer Store. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Bootstrap JS -->
-    <script src="assets/bootstrap/bootstrap.bundle.min.js"></script>
-    <!-- Dark Mode Toggle -->
-    <script src="assets/js/darkmodetoggle.js"></script>
-    <script>
-        // Update button states based on current theme
-        document.addEventListener('DOMContentLoaded', function() {
-            const updateButtonStates = () => {
-                const currentTheme = document.documentElement.getAttribute('data-bs-theme');
-                const lightBtn = document.querySelector('[data-bs-theme-value="light"]');
-                const darkBtn = document.querySelector('[data-bs-theme-value="dark"]');
-                
-                if (lightBtn && darkBtn) {
-                    if (currentTheme === 'dark') {
-                        lightBtn.classList.remove('active');
-                        darkBtn.classList.add('active');
-                    } else {
-                        lightBtn.classList.add('active');
-                        darkBtn.classList.remove('active');
-                    }
-                }
-            };
-            
-            // Update on load
-            updateButtonStates();
-            
-            // Update when theme changes
-            const observer = new MutationObserver(updateButtonStates);
-            observer.observe(document.documentElement, {
-                attributes: true,
-                attributeFilter: ['data-bs-theme']
-            });
-        });
-    </script>
-    <!-- Custom JS -->
-    <script src="assets/js/main.js"></script>
-    <script src="assets/js/auth.js"></script>
-    <script src="assets/js/cart.js"></script>
-</body>
-</html>
-
-
+<?php include 'includes/footer.php'; ?>

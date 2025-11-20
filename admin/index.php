@@ -1,4 +1,46 @@
-﻿<!DOCTYPE html>
+﻿<?php
+require_once '../config/db.php';
+session_start();
+
+// Check if user is admin
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+    header("Location: ../login.php");
+    exit;
+}
+
+// Fetch Stats
+try {
+    // Total Sales
+    $stmt = $pdo->query("SELECT SUM(total_price) as total_sales FROM orders");
+    $total_sales = $stmt->fetchColumn() ?: 0;
+
+    // Total Orders
+    $stmt = $pdo->query("SELECT COUNT(*) FROM orders");
+    $total_orders = $stmt->fetchColumn();
+
+    // Total Products
+    $stmt = $pdo->query("SELECT COUNT(*) FROM products");
+    $total_products = $stmt->fetchColumn();
+
+    // Total Users
+    $stmt = $pdo->query("SELECT COUNT(*) FROM users WHERE is_admin = 0");
+    $total_users = $stmt->fetchColumn();
+
+    // Recent Orders
+    $stmt = $pdo->query("
+        SELECT o.*, u.name as user_name 
+        FROM orders o 
+        JOIN users u ON o.user_id = u.id 
+        ORDER BY o.order_date DESC 
+        LIMIT 5
+    ");
+    $recent_orders = $stmt->fetchAll();
+
+} catch (PDOException $e) {
+    $error = "Error loading dashboard data.";
+}
+?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -78,8 +120,39 @@
                 </div>
 
                 <!-- Statistics -->
-                <div id="dashboard-stats">
-                    <!-- Stats will be loaded here -->
+                <div id="dashboard-stats" class="row">
+                    <div class="col-md-3 mb-4">
+                        <div class="card text-white bg-primary">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Sales</h5>
+                                <p class="card-text display-6">$<?php echo number_format($total_sales, 2); ?></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="card text-white bg-success">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Orders</h5>
+                                <p class="card-text display-6"><?php echo $total_orders; ?></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="card text-white bg-warning">
+                            <div class="card-body">
+                                <h5 class="card-title">Products</h5>
+                                <p class="card-text display-6"><?php echo $total_products; ?></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="card text-white bg-info">
+                            <div class="card-body">
+                                <h5 class="card-title">Users</h5>
+                                <p class="card-text display-6"><?php echo $total_users; ?></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Recent Orders -->
@@ -97,7 +170,21 @@
                                 </tr>
                             </thead>
                             <tbody id="recent-orders-table">
-                                <!-- Recent orders will be loaded here -->
+                                <?php if (empty($recent_orders)): ?>
+                                    <tr><td colspan="5" class="text-center">No orders yet.</td></tr>
+                                <?php else: ?>
+                                    <?php foreach ($recent_orders as $order): ?>
+                                    <tr>
+                                        <td>#<?php echo $order['id']; ?></td>
+                                        <td><?php echo htmlspecialchars($order['user_name']); ?></td>
+                                        <td>$<?php echo number_format($order['total_price'], 2); ?></td>
+                                        <td><?php echo date('M j, Y', strtotime($order['order_date'])); ?></td>
+                                        <td>
+                                            <a href="orders.php" class="btn btn-sm btn-info">View</a>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -142,41 +229,5 @@
     </script>
     <!-- Custom JS -->
     <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/auth.js"></script>
-    <script src="../assets/js/admin.js"></script>
-    <script>
-        // Display recent orders
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!requireAdmin()) return;
-
-            const orders = getOrders();
-            const users = getUsers();
-            const recentOrders = orders.slice(-5).reverse(); // Last 5 orders
-
-            const tableBody = document.getElementById('recent-orders-table');
-            if (tableBody) {
-                if (recentOrders.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No orders yet.</td></tr>';
-                } else {
-                    tableBody.innerHTML = recentOrders.map(order => {
-                        const user = users.find(u => u.id === order.user_id);
-                        return `
-                            <tr>
-                                <td>#${order.id}</td>
-                                <td>${user ? user.name : 'Unknown'}</td>
-                                <td>${formatCurrency(order.total_price)}</td>
-                                <td>${new Date(order.order_date).toLocaleDateString()}</td>
-                                <td>
-                                    <a href="orders.php" class="btn btn-sm btn-info">View</a>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('');
-                }
-            }
-        });
-    </script>
 </body>
 </html>
-
-

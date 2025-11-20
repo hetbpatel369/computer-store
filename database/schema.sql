@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Products table
 CREATE TABLE IF NOT EXISTS products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
@@ -27,7 +26,6 @@ CREATE TABLE IF NOT EXISTS products (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Cart table
 CREATE TABLE IF NOT EXISTS cart (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -39,7 +37,6 @@ CREATE TABLE IF NOT EXISTS cart (
     UNIQUE KEY unique_cart_item (user_id, product_id)
 );
 
--- Orders table
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -54,7 +51,6 @@ CREATE TABLE IF NOT EXISTS orders (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Order items table (for storing order details)
 CREATE TABLE IF NOT EXISTS order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
@@ -65,13 +61,10 @@ CREATE TABLE IF NOT EXISTS order_items (
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
--- Insert default admin user
--- Password: admin123 (use password_hash('admin123', PASSWORD_DEFAULT) in PHP)
 INSERT INTO users (name, email, password, is_admin) VALUES
 ('Admin User', 'admin@admin.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1)
 ON DUPLICATE KEY UPDATE name=name;
 
--- Insert sample products
 INSERT INTO products (name, description, price, image_url, category, stock) VALUES
 ('Gaming Desktop PC - RTX 4080', 'High-performance gaming desktop with NVIDIA RTX 4080, Intel i7-13700K, 32GB DDR5 RAM, 1TB NVMe SSD', 2499.99, 'https://via.placeholder.com/400x300?text=Gaming+Desktop', 'desktops', 15),
 ('Workstation Desktop - Professional', 'Professional workstation with AMD Ryzen 9 7950X, 64GB DDR5 RAM, 2TB NVMe SSD, NVIDIA RTX A4000', 3499.99, 'https://via.placeholder.com/400x300?text=Workstation+PC', 'desktops', 8),

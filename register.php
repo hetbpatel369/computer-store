@@ -1,156 +1,86 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Computer Store</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="assets/bootstrap/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
-    <header>
-        <!-- Navigation -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <i class="fas fa-desktop"></i> Computer Store
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="products.php">Products</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item d-flex align-items-center">
-                        <div class="btn-group" role="group" aria-label="Theme switcher">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-theme-value="light">Light</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-theme-value="dark">Dark</button>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="login.php">Login</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        </nav>
-    </header>
+﻿<?php
+require_once 'config/db.php';
 
-    <!-- Main Content -->
-    <main class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="card shadow">
-                    <div class="card-body p-5">
-                        <h2 class="card-title text-center mb-4">Register</h2>
-                        <form id="register-form" method="POST" onsubmit="handleRegister(event)">
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Full Name</label>
-                                <input type="text" class="form-control" id="name" name="name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" required minlength="6">
-                                <div class="form-text">Password must be at least 6 characters long.</div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="confirm-password" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100 mb-3">Register</button>
-                            <div class="text-center">
-                                <p>Already have an account? <a href="login.php">Login here</a></p>
-                            </div>
-                        </form>
-                    </div>
+$error = '';
+$success = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = trim($_POST['name']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    if (empty($name) || empty($email) || empty($password)) {
+        $error = 'All fields are required.';
+    } elseif ($password !== $confirm_password) {
+        $error = 'Passwords do not match.';
+    } else {
+        // Check if email exists
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        if ($stmt->rowCount() > 0) {
+            $error = 'Email already registered.';
+        } else {
+            // Hash password
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+            // Insert user
+            $stmt = $pdo->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+            if ($stmt->execute([$name, $email, $hashed_password])) {
+                $success = 'Registration successful! You can now <a href="login.php">login</a>.';
+            } else {
+                $error = 'Something went wrong. Please try again.';
+            }
+        }
+    }
+}
+
+$pageTitle = 'Register - Computer Store';
+include 'includes/header.php';
+include 'includes/navbar.php';
+?>
+
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="card-title text-center mb-4">Register</h2>
+                    
+                    <?php if ($error): ?>
+                        <div class="alert alert-danger"><?php echo $error; ?></div>
+                    <?php endif; ?>
+                    
+                    <?php if ($success): ?>
+                        <div class="alert alert-success"><?php echo $success; ?></div>
+                    <?php endif; ?>
+
+                    <form method="POST" action="register.php">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mb-3">Register</button>
+                        <div class="text-center">
+                            <p>Already have an account? <a href="login.php">Login here</a></p>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container text-center py-3">
-            <p>&copy; 2024 Computer Store. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Bootstrap JS -->
-    <script src="assets/bootstrap/bootstrap.bundle.min.js"></script>
-    <!-- Dark Mode Toggle -->
-    <script src="assets/js/darkmodetoggle.js"></script>
-    <script>
-        // Update button states based on current theme
-        document.addEventListener('DOMContentLoaded', function() {
-            const updateButtonStates = () => {
-                const currentTheme = document.documentElement.getAttribute('data-bs-theme');
-                const lightBtn = document.querySelector('[data-bs-theme-value="light"]');
-                const darkBtn = document.querySelector('[data-bs-theme-value="dark"]');
-                
-                if (lightBtn && darkBtn) {
-                    if (currentTheme === 'dark') {
-                        lightBtn.classList.remove('active');
-                        darkBtn.classList.add('active');
-                    } else {
-                        lightBtn.classList.add('active');
-                        darkBtn.classList.remove('active');
-                    }
-                }
-            };
-            
-            // Update on load
-            updateButtonStates();
-            
-            // Update when theme changes
-            const observer = new MutationObserver(updateButtonStates);
-            observer.observe(document.documentElement, {
-                attributes: true,
-                attributeFilter: ['data-bs-theme']
-            });
-        });
-    </script>
-    <!-- Custom JS -->
-    <script src="assets/js/main.js"></script>
-    <script src="assets/js/auth.js"></script>
-    <script>
-        function handleRegister(event) {
-            event.preventDefault();
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-
-            if (registerUser(name, email, password, confirmPassword)) {
-                setTimeout(() => {
-                    redirectTo('login.php');
-                }, 1500);
-            }
-        }
-
-        // Redirect if already logged in
-        document.addEventListener('DOMContentLoaded', function() {
-            if (isLoggedIn()) {
-                redirectTo('index.php');
-            }
-        });
-    </script>
-</body>
-</html>
-
-
+<?php include 'includes/footer.php'; ?>

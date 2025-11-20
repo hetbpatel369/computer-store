@@ -1,4 +1,27 @@
-﻿<!DOCTYPE html>
+﻿<?php
+require_once '../config/db.php';
+session_start();
+
+// Check if user is admin
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+    header("Location: ../login.php");
+    exit;
+}
+
+// Fetch Orders
+try {
+    $stmt = $pdo->query("
+        SELECT o.*, u.name as user_name, u.email as user_email 
+        FROM orders o 
+        JOIN users u ON o.user_id = u.id 
+        ORDER BY o.order_date DESC
+    ");
+    $orders = $stmt->fetchAll();
+} catch (PDOException $e) {
+    $error = "Error loading orders.";
+}
+?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -77,6 +100,13 @@
                     <h1 class="h2">Manage Orders</h1>
                 </div>
 
+                <?php if (isset($_GET['success'])): ?>
+                    <div class="alert alert-success"><?php echo htmlspecialchars($_GET['success']); ?></div>
+                <?php endif; ?>
+                <?php if (isset($_GET['error'])): ?>
+                    <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['error']); ?></div>
+                <?php endif; ?>
+
                 <!-- Orders Table -->
                 <div class="card">
                     <div class="card-header">
@@ -92,35 +122,46 @@
                                         <th>Email</th>
                                         <th>Total</th>
                                         <th>Date</th>
+                                        <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="admin-orders-table">
-                                    <!-- Orders will be loaded here -->
+                                    <?php foreach ($orders as $order): ?>
+                                    <tr>
+                                        <td>#<?php echo $order['id']; ?></td>
+                                        <td><?php echo htmlspecialchars($order['user_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($order['user_email']); ?></td>
+                                        <td>$<?php echo number_format($order['total_price'], 2); ?></td>
+                                        <td><?php echo date('M j, Y', strtotime($order['order_date'])); ?></td>
+                                        <td>
+                                            <?php 
+                                            $status = $order['status'] ?? 'pending';
+                                            $badge_class = 'bg-warning';
+                                            if ($status === 'completed') $badge_class = 'bg-success';
+                                            if ($status === 'delivered') $badge_class = 'bg-info';
+                                            ?>
+                                            <span class="badge <?php echo $badge_class; ?>"><?php echo ucfirst($status); ?></span>
+                                        </td>
+                                        <td>
+                                            <form action="order_actions.php" method="POST" class="d-inline">
+                                                <input type="hidden" name="action" value="update_status">
+                                                <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
+                                                <select name="status" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+                                                    <option value="pending" <?php echo ($status === 'pending') ? 'selected' : ''; ?>>Pending</option>
+                                                    <option value="completed" <?php echo ($status === 'completed') ? 'selected' : ''; ?>>Completed</option>
+                                                    <option value="delivered" <?php echo ($status === 'delivered') ? 'selected' : ''; ?>>Delivered</option>
+                                                </select>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </main>
-        </div>
-    </div>
-
-    <!-- Order Details Modal -->
-    <div class="modal fade" id="order-details-modal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Order Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="order-details-modal-body">
-                    <!-- Order details will be loaded here -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -160,9 +201,5 @@
     </script>
     <!-- Custom JS -->
     <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/auth.js"></script>
-    <script src="../assets/js/admin.js"></script>
 </body>
 </html>
-
-
