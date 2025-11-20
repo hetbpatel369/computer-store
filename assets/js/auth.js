@@ -1,4 +1,4 @@
-// Authentication JavaScript
+﻿// Authentication JavaScript
 // Handles user registration, login, logout, and session management
 
 // Register user
@@ -57,10 +57,10 @@ function loginUser(email, password) {
     if (user.is_admin === 1) {
         setCurrentAdmin(user);
         showToast('Admin login successful!', 'success');
-        setTimeout(() => redirectTo('admin/index.html'), 500);
+        setTimeout(() => redirectTo('admin/index.php'), 500);
     } else {
         showToast('Login successful!', 'success');
-        setTimeout(() => redirectTo('index.html'), 500);
+        setTimeout(() => redirectTo('index.php'), 500);
     }
     return true;
 }
@@ -88,7 +88,7 @@ function loginAdmin(email, password) {
     setCurrentUser(user);
     showToast('Admin login successful!', 'success');
     setTimeout(() => {
-        redirectTo('admin/index.html');
+        redirectTo('admin/index.php');
     }, 500);
 
     return true;
@@ -98,7 +98,7 @@ function loginAdmin(email, password) {
 function logout() {
     setCurrentUser(null);
     setCurrentAdmin(null);
-    redirectTo('index.html');
+    redirectTo('index.php');
 }
 
 // Check if user is logged in
@@ -116,7 +116,7 @@ function isAdmin() {
 function requireLogin() {
     if (!isLoggedIn()) {
         showToast('Please login to continue', 'warning');
-        redirectTo('login.html');
+        redirectTo('login.php');
         return false;
     }
     return true;
@@ -126,7 +126,7 @@ function requireLogin() {
 function requireAdmin() {
     if (!isAdmin()) {
         showToast('Admin access required', 'danger');
-        redirectTo('index.html');
+        redirectTo('index.php');
         return false;
     }
     return true;
@@ -170,4 +170,5 @@ function updateNavigation() {
 document.addEventListener('DOMContentLoaded', function() {
     updateNavigation();
 });
+
 

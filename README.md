@@ -1,4 +1,4 @@
-# Online Computer Store - Frontend
+﻿# Online Computer Store - Frontend
 
 A full-featured e-commerce website for computer products built with HTML5, Bootstrap, and JavaScript. This frontend is designed to be easily ported to PHP/MySQL backend.
 
@@ -35,33 +35,33 @@ This is a web-based platform that allows users to browse computer products (lapt
 
 ```
 computer-store/
-├── index.html              # Homepage
-├── products.html           # Product listing page
-├── product.html            # Product detail page
-├── cart.html               # Shopping cart
-├── checkout.html           # Checkout page
-├── login.html              # User login
-├── register.html           # User registration
-├── logout.html             # Logout handler
-├── order-history.html      # User order history
-├── admin/
-│   ├── index.html          # Admin dashboard
-│   ├── products.html       # Manage products
-│   ├── orders.html         # View all orders
-│   └── users.html          # Manage users
-├── assets/
-│   ├── css/
-│   │   └── style.css       # Custom styles
-│   ├── js/
-│   │   ├── main.js         # Core utilities and data management
-│   │   ├── auth.js         # Authentication functions
-│   │   ├── products.js     # Product browsing and display
-│   │   ├── cart.js         # Shopping cart operations
-│   │   └── admin.js        # Admin CRUD operations
-│   └── images/             # Product images
-├── database/
-│   └── schema.sql          # Database schema for MySQL
-└── README.md               # This file
+|- index.php              # Homepage
+|- products.php           # Product listing page
+|- product.php            # Product detail page
+|- cart.php               # Shopping cart
+|- checkout.php           # Checkout page
+|- login.php              # User login
+|- register.php           # User registration
+|- logout.php             # Logout handler
+|- order-history.php      # User order history
+|- admin/
+|  |- index.php           # Admin dashboard
+|  |- products.php        # Manage products
+|  |- orders.php          # View all orders
+|  |- users.php           # Manage users
+|- assets/
+|  |- css/
+|  |  |- style.css        # Custom styles
+|  |- js/
+|  |  |- main.js          # Core utilities and data management
+|  |  |- auth.js          # Authentication functions
+|  |  |- products.js      # Product browsing and display
+|  |  |- cart.js          # Shopping cart operations
+|  |  |- admin.js         # Admin CRUD operations
+|  |- images/             # Product images
+|- database/
+|  |- schema.sql          # Database schema for MySQL
+|- README.md              # This file
 ```
 
 ## Setup Instructions
@@ -69,7 +69,7 @@ computer-store/
 ### For Frontend Only (Current Implementation)
 
 1. Clone or download this repository
-2. Open `index.html` in a web browser
+2. Open `index.php` in a web browser
 3. The application uses localStorage, so no server is required for frontend testing
 
 ### Default Accounts
@@ -88,7 +88,7 @@ computer-store/
 2. Place project files in `htdocs` (XAMPP) or `www` (LAMP)
 3. Start Apache and MySQL services
 4. Open phpMyAdmin and import `database/schema.sql`
-5. Convert `.html` files to `.php` files
+5. Ensure all routes and links point to the `.php` files (no legacy HTML endpoints)
 6. Replace localStorage calls with PHP/MySQL queries
 7. Implement PHP session management
 8. Use prepared statements for SQL queries
@@ -148,4 +148,5 @@ This project is created for educational purposes.
 - Use `password_hash()` for secure password storage
 - Implement proper session management
 - Add server-side validation in addition to client-side validation
+
 

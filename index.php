@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -17,7 +17,7 @@
         <!-- Navigation -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.html">
+            <a class="navbar-brand" href="index.php">
                 <i class="fas fa-desktop"></i> Computer Store
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -26,10 +26,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="index.html">Home</a>
+                        <a class="nav-link active" href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="products.html">Products</a>
+                        <a class="nav-link" href="products.php">Products</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
@@ -40,29 +40,29 @@
                         </div>
                     </li>
                     <li class="nav-item" id="nav-login-link">
-                        <a class="nav-link" href="login.html">Login</a>
+                        <a class="nav-link" href="login.php">Login</a>
                     </li>
                     <li class="nav-item" id="nav-register-link">
-                        <a class="nav-link" href="register.html">Register</a>
+                        <a class="nav-link" href="register.php">Register</a>
                     </li>
                     <li class="nav-item dropdown" id="nav-user-menu" style="display: none;">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user"></i> <span class="nav-user-name"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="order-history.html">Order History</a></li>
+                            <li><a class="dropdown-item" href="order-history.php">Order History</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="logout.html">Logout</a></li>
+                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
                     </li>
                     <li class="nav-item" id="nav-cart-link" style="display: none;">
-                        <a class="nav-link" href="cart.html">
+                        <a class="nav-link" href="cart.php">
                             <i class="fas fa-shopping-cart"></i> Cart
                             <span class="cart-count badge bg-danger" style="display: none;">0</span>
                         </a>
                     </li>
                     <li class="nav-item" id="nav-admin-link" style="display: none;">
-                        <a class="nav-link" href="admin/index.html">
+                        <a class="nav-link" href="admin/index.php">
                             <i class="fas fa-cog"></i> Admin
                         </a>
                     </li>
@@ -77,7 +77,7 @@
         <div class="container text-center">
             <h1 class="text-shadow">Welcome to Computer Store</h1>
             <p class="text-shadow">Your one-stop shop for all computer products and accessories</p>
-            <a href="products.html" class="btn btn-light btn-lg">
+            <a href="products.php" class="btn btn-light btn-lg">
                 <i class="fas fa-shopping-bag"></i> Shop Now
             </a>
         </div>
@@ -113,10 +113,10 @@
                 <div class="col-md-4 mb-4">
                     <h5>Quick Links</h5>
                     <ul class="list-unstyled">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="products.html">Products</a></li>
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="register.html">Register</a></li>
+                        <li><a href="index.php">Home</a></li>
+                        <li><a href="products.php">Products</a></li>
+                        <li><a href="login.php">Login</a></li>
+                        <li><a href="register.php">Register</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4 mb-4">
@@ -185,7 +185,7 @@
             const categoriesContainer = document.getElementById('categories-container');
             categoriesContainer.innerHTML = categories.map(cat => `
                 <div class="col-6 col-md-4 col-lg-2">
-                    <a href="products.html?category=${cat.category}" class="category-card">
+                    <a href="products.php?category=${cat.category}" class="category-card">
                         <div class="card text-center h-100">
                             <div class="card-body">
                                 <i class="fas fa-${cat.icon} fa-3x text-primary mb-3"></i>
@@ -214,7 +214,7 @@
                                             ? `<span class="badge bg-success ms-2">In Stock</span>` 
                                             : '<span class="badge bg-danger ms-2">Out of Stock</span>'}
                                     </p>
-                                    <a href="product.html?id=${product.id}" class="btn btn-primary w-100">View Details</a>
+                                    <a href="product.php?id=${product.id}" class="btn btn-primary w-100">View Details</a>
                                 </div>
                             </div>
                         </div>
@@ -225,4 +225,5 @@
     </script>
 </body>
 </html>
+
 

@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Orders - Computer Store Admin</title>
+    <title>Manage Products - Computer Store Admin</title>
     
     <!-- Bootstrap CSS -->
     <link href="../assets/bootstrap/bootstrap.min.css" rel="stylesheet">
@@ -17,7 +17,7 @@
         <!-- Navigation -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="../index.html">
+            <a class="navbar-brand" href="../index.php">
                 <i class="fas fa-desktop"></i> Computer Store - Admin
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -32,10 +32,10 @@
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../index.html">View Site</a>
+                        <a class="nav-link" href="../index.php">View Site</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../logout.html">Logout</a>
+                        <a class="nav-link" href="../logout.php">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -49,22 +49,22 @@
             <nav class="col-md-3 col-lg-2 admin-sidebar">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">
+                        <a class="nav-link" href="index.php">
                             <i class="fas fa-tachometer-alt"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="products.html">
+                        <a class="nav-link active" href="products.php">
                             <i class="fas fa-box"></i> Products
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="orders.html">
+                        <a class="nav-link" href="orders.php">
                             <i class="fas fa-shopping-cart"></i> Orders
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="users.html">
+                        <a class="nav-link" href="users.php">
                             <i class="fas fa-users"></i> Users
                         </a>
                     </li>
@@ -74,53 +74,88 @@
             <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Manage Orders</h1>
+                    <h1 class="h2">Manage Products</h1>
+                    <button class="btn btn-primary" onclick="resetProductForm()">
+                        <i class="fas fa-plus"></i> Add New Product
+                    </button>
                 </div>
 
-                <!-- Orders Table -->
+                <!-- Product Form -->
+                <div class="card mb-4" id="product-form-section">
+                    <div class="card-header">
+                        <h5 id="product-form-title">Add New Product</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="product-form" onsubmit="handleProductSubmit(event)">
+                            <input type="hidden" id="product-id" value="">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="product-name" class="form-label">Product Name</label>
+                                    <input type="text" class="form-control" id="product-name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="product-category" class="form-label">Category</label>
+                                    <select class="form-select" id="product-category" required>
+                                        <option value="">Select category</option>
+                                        <option value="desktops">Desktops</option>
+                                        <option value="graphics-cards">Graphics Cards</option>
+                                        <option value="memory">Memory</option>
+                                        <option value="laptops">Laptops</option>
+                                        <option value="accessories">Accessories</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="product-description" class="form-label">Description</label>
+                                <textarea class="form-control" id="product-description" rows="3" required></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="product-price" class="form-label">Price ($)</label>
+                                    <input type="number" class="form-control" id="product-price" step="0.01" min="0" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="product-stock" class="form-label">Stock</label>
+                                    <input type="number" class="form-control" id="product-stock" min="0" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="product-image-url" class="form-label">Image URL</label>
+                                    <input type="url" class="form-control" id="product-image-url" placeholder="https://...">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="product-submit-btn">Add Product</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetProductForm()">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Products Table -->
                 <div class="card">
                     <div class="card-header">
-                        <h5>All Orders</h5>
+                        <h5>All Products</h5>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-striped table-hover admin-table">
                                 <thead>
                                     <tr>
-                                        <th>Order ID</th>
-                                        <th>Customer Name</th>
-                                        <th>Email</th>
-                                        <th>Total</th>
-                                        <th>Date</th>
+                                        <th>ID</th>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="admin-orders-table">
-                                    <!-- Orders will be loaded here -->
+                                <tbody id="admin-products-table">
+                                    <!-- Products will be loaded here -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </main>
-        </div>
-    </div>
-
-    <!-- Order Details Modal -->
-    <div class="modal fade" id="order-details-modal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Order Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="order-details-modal-body">
-                    <!-- Order details will be loaded here -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -161,7 +196,9 @@
     <!-- Custom JS -->
     <script src="../assets/js/main.js"></script>
     <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/products.js"></script>
     <script src="../assets/js/admin.js"></script>
 </body>
 </html>
+
 

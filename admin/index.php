@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Users - Computer Store Admin</title>
+    <title>Admin Dashboard - Computer Store</title>
     
     <!-- Bootstrap CSS -->
     <link href="../assets/bootstrap/bootstrap.min.css" rel="stylesheet">
@@ -17,7 +17,7 @@
         <!-- Navigation -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="../index.html">
+            <a class="navbar-brand" href="../index.php">
                 <i class="fas fa-desktop"></i> Computer Store - Admin
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -32,10 +32,10 @@
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../index.html">View Site</a>
+                        <a class="nav-link" href="../index.php">View Site</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../logout.html">Logout</a>
+                        <a class="nav-link" href="../logout.php">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -49,22 +49,22 @@
             <nav class="col-md-3 col-lg-2 admin-sidebar">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">
+                        <a class="nav-link active" href="index.php">
                             <i class="fas fa-tachometer-alt"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="products.html">
+                        <a class="nav-link" href="products.php">
                             <i class="fas fa-box"></i> Products
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="orders.html">
+                        <a class="nav-link" href="orders.php">
                             <i class="fas fa-shopping-cart"></i> Orders
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="users.html">
+                        <a class="nav-link" href="users.php">
                             <i class="fas fa-users"></i> Users
                         </a>
                     </li>
@@ -74,31 +74,32 @@
             <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Manage Users</h1>
+                    <h1 class="h2">Dashboard</h1>
                 </div>
 
-                <!-- Users Table -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5>All Users</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover admin-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-users-table">
-                                    <!-- Users will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
+                <!-- Statistics -->
+                <div id="dashboard-stats">
+                    <!-- Stats will be loaded here -->
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="mt-5">
+                    <h3>Recent Orders</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>User</th>
+                                    <th>Total</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-orders-table">
+                                <!-- Recent orders will be loaded here -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </main>
@@ -143,6 +144,39 @@
     <script src="../assets/js/main.js"></script>
     <script src="../assets/js/auth.js"></script>
     <script src="../assets/js/admin.js"></script>
+    <script>
+        // Display recent orders
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!requireAdmin()) return;
+
+            const orders = getOrders();
+            const users = getUsers();
+            const recentOrders = orders.slice(-5).reverse(); // Last 5 orders
+
+            const tableBody = document.getElementById('recent-orders-table');
+            if (tableBody) {
+                if (recentOrders.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No orders yet.</td></tr>';
+                } else {
+                    tableBody.innerHTML = recentOrders.map(order => {
+                        const user = users.find(u => u.id === order.user_id);
+                        return `
+                            <tr>
+                                <td>#${order.id}</td>
+                                <td>${user ? user.name : 'Unknown'}</td>
+                                <td>${formatCurrency(order.total_price)}</td>
+                                <td>${new Date(order.order_date).toLocaleDateString()}</td>
+                                <td>
+                                    <a href="orders.php" class="btn btn-sm btn-info">View</a>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            }
+        });
+    </script>
 </body>
 </html>
+
 

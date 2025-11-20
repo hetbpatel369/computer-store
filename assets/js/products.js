@@ -1,4 +1,4 @@
-// Products JavaScript
+﻿// Products JavaScript
 // Handles product browsing, filtering, search, and display
 
 // Display products on page
@@ -25,7 +25,7 @@ function displayProducts(products, containerId) {
                                 ? `<span class="badge bg-success ms-2">In Stock (${product.stock})</span>` 
                                 : '<span class="badge bg-danger ms-2">Out of Stock</span>'}
                         </p>
-                        <a href="product.html?id=${product.id}" class="btn btn-primary w-100 mb-2">View Details</a>
+                        <a href="product.php?id=${product.id}" class="btn btn-primary w-100 mb-2">View Details</a>
                         ${isLoggedIn() && product.stock > 0 
                             ? `<button class="btn btn-outline-success w-100" onclick="addToCart(${product.id})">Add to Cart</button>` 
                             : ''}
@@ -68,7 +68,7 @@ function displayProductDetail(product) {
                     </div>
                     ${isLoggedIn() 
                         ? `<button class="btn btn-primary btn-lg" onclick="addToCartFromDetail(${product.id})">Add to Cart</button>` 
-                        : '<a href="login.html" class="btn btn-primary btn-lg">Login to Add to Cart</a>'}
+                        : '<a href="login.php" class="btn btn-primary btn-lg">Login to Add to Cart</a>'}
                 ` : '<button class="btn btn-secondary btn-lg" disabled>Out of Stock</button>'}
             </div>
         </div>
@@ -154,11 +154,11 @@ function displayCategoryFilter(containerId, currentCategory = 'all') {
     const categories = getCategories();
     container.innerHTML = `
         <div class="list-group">
-            <a href="products.html" class="list-group-item list-group-item-action ${currentCategory === 'all' ? 'active' : ''}">
+            <a href="products.php" class="list-group-item list-group-item-action ${currentCategory === 'all' ? 'active' : ''}">
                 All Categories
             </a>
             ${categories.map(cat => `
-                <a href="products.html?category=${cat}" class="list-group-item list-group-item-action ${currentCategory === cat ? 'active' : ''}">
+                <a href="products.php?category=${cat}" class="list-group-item list-group-item-action ${currentCategory === cat ? 'active' : ''}">
                     ${formatCategory(cat)}
                 </a>
             `).join('')}
@@ -201,7 +201,7 @@ function initProductDetailPage() {
     const productId = getUrlParameter('id');
     if (!productId) {
         showToast('Product ID is required', 'danger');
-        redirectTo('products.html');
+        redirectTo('products.php');
         return;
     }
 
@@ -217,9 +217,9 @@ function handleSearch(event) {
     const category = getUrlParameter('category') || 'all';
     
     if (query) {
-        redirectTo(`products.html?search=${encodeURIComponent(query)}&category=${category}`);
+        redirectTo(`products.php?search=${encodeURIComponent(query)}&category=${category}`);
     } else {
-        redirectTo(`products.html?category=${category}`);
+        redirectTo(`products.php?category=${category}`);
     }
 }
 
@@ -231,7 +231,7 @@ function handleSortChange() {
     
     if (sortSelect) {
         const sortBy = sortSelect.value;
-        let url = `products.html?sort=${sortBy}`;
+        let url = `products.php?sort=${sortBy}`;
         if (category !== 'all') url += `&category=${category}`;
         if (search) url += `&search=${encodeURIComponent(search)}`;
         redirectTo(url);
@@ -247,4 +247,5 @@ document.addEventListener('DOMContentLoaded', function() {
         initProductDetailPage();
     }
 });
+
 

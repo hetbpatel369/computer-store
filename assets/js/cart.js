@@ -1,11 +1,11 @@
-// Cart JavaScript
+﻿// Cart JavaScript
 // Handles shopping cart operations (add, remove, update quantities)
 
 // Add to cart
 function addToCart(productId, quantity = 1) {
     if (!isLoggedIn()) {
         showToast('Please login first', 'warning');
-        redirectTo('login.html');
+        redirectTo('login.php');
         return false;
     }
     
@@ -127,7 +127,7 @@ function displayCart() {
                 <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
                 <h4>Your cart is empty</h4>
                 <p class="text-muted">Add some products to get started!</p>
-                <a href="products.html" class="btn btn-primary">Browse Products</a>
+                <a href="products.php" class="btn btn-primary">Browse Products</a>
             </div>
         `;
         
@@ -192,7 +192,7 @@ function displayCart() {
                         <strong>Total:</strong>
                         <strong class="text-primary">${formatCurrency(total * 1.1)}</strong>
                     </div>
-                    <a href="checkout.html" class="btn btn-primary w-100" id="checkout-btn">Proceed to Checkout</a>
+                    <a href="checkout.php" class="btn btn-primary w-100" id="checkout-btn">Proceed to Checkout</a>
                 </div>
             </div>
         `;
@@ -201,7 +201,7 @@ function displayCart() {
         const checkoutBtn = document.getElementById('checkout-btn');
         if (checkoutBtn) {
             checkoutBtn.style.display = 'block';
-            checkoutBtn.onclick = () => redirectTo('checkout.html');
+            checkoutBtn.onclick = () => redirectTo('checkout.php');
         }
     }
 }
@@ -243,4 +243,5 @@ document.addEventListener('DOMContentLoaded', function() {
         initCartPage();
     }
 });
+
 

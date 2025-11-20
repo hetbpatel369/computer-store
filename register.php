@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Computer Store</title>
+    <title>Register - Computer Store</title>
     
     <!-- Bootstrap CSS -->
     <link href="assets/bootstrap/bootstrap.min.css" rel="stylesheet">
@@ -17,7 +17,7 @@
         <!-- Navigation -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.html">
+            <a class="navbar-brand" href="index.php">
                 <i class="fas fa-desktop"></i> Computer Store
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -26,10 +26,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">Home</a>
+                        <a class="nav-link" href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="products.html">Products</a>
+                        <a class="nav-link" href="products.php">Products</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
@@ -40,7 +40,7 @@
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="register.html">Register</a>
+                        <a class="nav-link" href="login.php">Login</a>
                     </li>
                 </ul>
             </div>
@@ -54,26 +54,28 @@
             <div class="col-md-6 col-lg-5">
                 <div class="card shadow">
                     <div class="card-body p-5">
-                        <h2 class="card-title text-center mb-4">Login</h2>
-                        <form id="login-form" method="POST" onsubmit="handleLogin(event)">
+                        <h2 class="card-title text-center mb-4">Register</h2>
+                        <form id="register-form" method="POST" onsubmit="handleRegister(event)">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="email" name="email" required>
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
+                                <input type="password" class="form-control" id="password" name="password" required minlength="6">
+                                <div class="form-text">Password must be at least 6 characters long.</div>
                             </div>
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="remember-me" name="remember_me">
-                                <label class="form-check-label" for="remember-me">
-                                    Remember me
-                                </label>
+                            <div class="mb-3">
+                                <label for="confirm-password" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+                            <button type="submit" class="btn btn-primary w-100 mb-3">Register</button>
                             <div class="text-center">
-                                <p>Don't have an account? <a href="register.html">Register here</a></p>
-                                <p><a href="admin/index.html">Admin Login</a></p>
+                                <p>Already have an account? <a href="login.php">Login here</a></p>
                             </div>
                         </form>
                     </div>
@@ -127,24 +129,28 @@
     <script src="assets/js/main.js"></script>
     <script src="assets/js/auth.js"></script>
     <script>
-        function handleLogin(event) {
+        function handleRegister(event) {
             event.preventDefault();
+            const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            loginUser(email, password);
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            if (registerUser(name, email, password, confirmPassword)) {
+                setTimeout(() => {
+                    redirectTo('login.php');
+                }, 1500);
+            }
         }
 
         // Redirect if already logged in
         document.addEventListener('DOMContentLoaded', function() {
             if (isLoggedIn()) {
-                if (isAdmin()) {
-                    redirectTo('admin/index.html');
-                } else {
-                    redirectTo('index.html');
-                }
+                redirectTo('index.php');
             }
         });
     </script>
 </body>
 </html>
+
 

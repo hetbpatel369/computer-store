@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -17,7 +17,7 @@
         <!-- Navigation -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.html">
+            <a class="navbar-brand" href="index.php">
                 <i class="fas fa-desktop"></i> Computer Store
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -26,10 +26,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">Home</a>
+                        <a class="nav-link" href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="products.html">Products</a>
+                        <a class="nav-link" href="products.php">Products</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
@@ -44,13 +44,13 @@
                             <i class="fas fa-user"></i> <span class="nav-user-name"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="order-history.html">Order History</a></li>
+                            <li><a class="dropdown-item" href="order-history.php">Order History</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="logout.html">Logout</a></li>
+                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="cart.html">
+                        <a class="nav-link" href="cart.php">
                             <i class="fas fa-shopping-cart"></i> Cart
                             <span class="cart-count badge bg-danger" style="display: none;">0</span>
                         </a>
@@ -219,7 +219,7 @@
             const cartItems = getCartItemsWithDetails();
             if (cartItems.length === 0) {
                 showToast('Your cart is empty', 'warning');
-                redirectTo('cart.html');
+                redirectTo('cart.php');
                 return;
             }
 
@@ -258,7 +258,7 @@
 
             showToast('Order placed successfully!', 'success');
             setTimeout(() => {
-                redirectTo('order-history.html');
+                redirectTo('order-history.php');
             }, 1500);
         }
 
@@ -269,7 +269,7 @@
             const cartItems = getCartItemsWithDetails();
             if (cartItems.length === 0) {
                 showToast('Your cart is empty', 'warning');
-                redirectTo('cart.html');
+                redirectTo('cart.php');
                 return;
             }
 
@@ -278,4 +278,5 @@
     </script>
 </body>
 </html>
+
 
