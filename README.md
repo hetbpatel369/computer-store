@@ -79,8 +79,8 @@ computer-store/
 - Password: `admin123`
 
 **Test User Account:**
-- Email: `user@test.com`
-- Password: `user123`
+- Email: `prof2@test.com`
+- Password: `password123`
 
 ### For PHP/MySQL Backend (Future Implementation)
 
