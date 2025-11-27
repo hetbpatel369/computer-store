@@ -36,24 +36,6 @@
   position: relative;
   z-index: 1;
   text-align: center;
-}
-
-.text-shadow {
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.product-card img {
-    transition: transform 0.3s;
-}
-
-.product-card:hover img {
-    transform: scale(1.05);
-}
-
-/* Footer Shadow */
-footer {
-    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
-    position: relative;
     z-index: 10;
 }
 

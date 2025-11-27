@@ -6,6 +6,14 @@ if (session_status() === PHP_SESSION_NONE) {
 ?>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
+<?php
+// Only start the session if one hasn't been started yet
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -13,9 +21,9 @@ if (session_status() === PHP_SESSION_NONE) {
     <title><?php echo isset($pageTitle) ? $pageTitle : 'Computer Store'; ?></title>
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="<?php echo isset($pathPrefix) ? $pathPrefix : ''; ?>css/bootstrap.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="<?php echo isset($pathPrefix) ? $pathPrefix : ''; ?>css/style.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>

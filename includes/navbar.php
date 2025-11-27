@@ -71,11 +71,14 @@ if (session_status() === PHP_SESSION_NONE) {
                     <?php endif; ?>
 
                     <!-- Dark Mode Toggle -->
-                    <li class="nav-item ms-3">
-                        <button class="btn btn-link nav-link" id="darkModeToggle">
-                            <i class="fas fa-moon"></i>
-                        </button>
-                    </li>
+                    <li class="nav-item me-3">
+                    <div class="btn-group" role="group" aria-label="Theme switcher">
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                            data-bs-theme-value="light">Light</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                            data-bs-theme-value="dark">Dark</button>
+                    </div>
+                </li>
                 </ul>
             </div>
         </div>

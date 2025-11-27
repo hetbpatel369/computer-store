@@ -14,6 +14,7 @@ $result = mysqli_query($conn, $sql);
 $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 $pageTitle = 'Manage Users';
+$pathPrefix = '../';
 include '../includes/header.php';
 include '../includes/admin_navbar.php';
 ?>

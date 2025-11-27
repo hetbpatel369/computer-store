@@ -17,6 +17,7 @@ $result = mysqli_query($conn, $sql);
 $orders = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 $pageTitle = 'Manage Orders';
+$pathPrefix = '../';
 include '../includes/header.php';
 include '../includes/admin_navbar.php';
 ?>
