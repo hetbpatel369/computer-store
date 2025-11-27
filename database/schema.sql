@@ -1,9 +1,9 @@
--- Computer Store Database Schema
+-- Next Gen Tech Database Schema
 -- This SQL file matches the localStorage structure and is ready for MySQL/phpMyAdmin
 
 -- Create database (uncomment if needed)
--- CREATE DATABASE IF NOT EXISTS computer_store;
--- USE computer_store;
+-- CREATE DATABASE IF NOT EXISTS nextgentech;
+-- USE nextgentech;
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (

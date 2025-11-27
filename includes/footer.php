@@ -1,71 +1,83 @@
-<!-- Footer -->
-<footer>
+<footer class="bg-dark text-light pt-5 pb-3 mt-auto">
     <div class="container">
         <div class="row">
-            <div class="col-md-4 mb-4">
-                <h5>Computer Store</h5>
-                <p>Your trusted source for computer products and accessories.</p>
-            </div>
-            <div class="col-md-4 mb-4">
-                <h5>Quick Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="index.php">Home</a></li>
-                    <li><a href="products.php">Products</a></li>
-                    <li><a href="login.php">Login</a></li>
-                    <li><a href="register.php">Register</a></li>
-                </ul>
-            </div>
-            <div class="col-md-4 mb-4">
-                <h5>Contact</h5>
-                <p>
-                    <i class="fas fa-envelope"></i> info@computerstore.com<br>
-                    <i class="fas fa-phone"></i> +1 (555) 123-4567
+            <!-- Brand & About -->
+            <div class="col-md-3 mb-4">
+                <h5 class="text-uppercase fw-bold text-primary"><i class="fas fa-desktop me-2"></i>Next Gen Tech</h5>
+                <p class="small text-secondary">
+                    Your one-stop shop for high-performance computers, components, and accessories. Quality guaranteed.
                 </p>
             </div>
+
+            <!-- Quick Links -->
+            <div class="col-md-3 mb-4">
+                <h5 class="text-uppercase fw-bold mb-3">Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="index.php"
+                            class="text-decoration-none text-secondary hover-white">Home</a></li>
+                    <li class="mb-2"><a href="products.php" class="text-decoration-none text-secondary hover-white">All
+                            Products</a></li>
+                    <li class="mb-2"><a href="cart.php" class="text-decoration-none text-secondary hover-white">My
+                            Cart</a></li>
+                    <li class="mb-2"><a href="login.php" class="text-decoration-none text-secondary hover-white">Login /
+                            Register</a></li>
+                </ul>
+            </div>
+
+            <!-- Categories -->
+            <div class="col-md-3 mb-4">
+                <h5 class="text-uppercase fw-bold mb-3">Categories</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="products.php?category=desktops"
+                            class="text-decoration-none text-secondary hover-white">Desktops</a></li>
+                    <li class="mb-2"><a href="products.php?category=laptops"
+                            class="text-decoration-none text-secondary hover-white">Laptops</a></li>
+                    <li class="mb-2"><a href="products.php?category=graphics-cards"
+                            class="text-decoration-none text-secondary hover-white">Graphics Cards</a></li>
+                    <li class="mb-2"><a href="products.php?category=accessories"
+                            class="text-decoration-none text-secondary hover-white">Accessories</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact & Social -->
+            <div class="col-md-3 mb-4">
+                <h5 class="text-uppercase fw-bold mb-3">Contact Us</h5>
+                <ul class="list-unstyled text-secondary">
+                    <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> 24 Queen Street, Brampton, ON, Canada
+                    </li>
+                    <li class="mb-2"><i class="fas fa-envelope me-2"></i> support@nextgentech.com</li>
+                    <li class="mb-2"><i class="fas fa-phone me-2"></i> +1 (647) 234-5678</li>
+                </ul>
+                <div class="mt-3">
+                    <a href="" class="text-light me-3"><i class="fab fa-facebook-f fa-lg"></i></a>
+                    <a href="" class="text-light me-3"><i class="fab fa-twitter fa-lg"></i></a>
+                    <a href="" class="text-light me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                    <a href="" class="text-light"><i class="fab fa-linkedin-in fa-lg"></i></a>
+                </div>
+            </div>
         </div>
-        <hr class="bg-light">
-        <div class="text-center">
-            <p>&copy; 2025 Computer Store. All rights reserved.</p>
+
+        <hr class="mb-4 border-secondary">
+
+        <div class="row">
+            <div class="col-12 text-center text-secondary">
+                <p class="mb-0">
+                    &copy; <?php echo date("Y"); ?> <strong>Next Gen Tech</strong>. All rights reserved.
+                </p>
+            </div>
         </div>
     </div>
 </footer>
 
-<!-- Bootstrap JS -->
-<script src="assets/bootstrap/bootstrap.bundle.min.js"></script>
-<!-- Dark Mode Toggle -->
-<script src="assets/js/darkmodetoggle.js"></script>
-<script>
-    // Update button states based on current theme
-    document.addEventListener('DOMContentLoaded', function () {
-        const updateButtonStates = () => {
-            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
-            const lightBtn = document.querySelector('[data-bs-theme-value="light"]');
-            const darkBtn = document.querySelector('[data-bs-theme-value="dark"]');
+<style>
+    .hover-white:hover {
+        color: #fff !important;
+        transition: color 0.3s ease;
+    }
+</style>
 
-            if (lightBtn && darkBtn) {
-                if (currentTheme === 'dark') {
-                    lightBtn.classList.remove('active');
-                    darkBtn.classList.add('active');
-                } else {
-                    lightBtn.classList.add('active');
-                    darkBtn.classList.remove('active');
-                }
-            }
-        };
-
-        // Update on load
-        updateButtonStates();
-
-        // Update when theme changes
-        const observer = new MutationObserver(updateButtonStates);
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['data-bs-theme']
-        });
-    });
-</script>
-<!-- Custom JS -->
-<script src="assets/js/main.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/darkmodetoggle.js"></script>
 </body>
 
 </html>

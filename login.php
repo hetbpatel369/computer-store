@@ -1,39 +1,36 @@
 ﻿<?php
-require_once 'config/db.php';
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Redirect if already logged in
-if (isset($_SESSION['user_id'])) {
-    if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
-        header("Location: admin/index.php");
-    } else {
-        header("Location: index.php");
-    }
-    exit;
-}
+require_once 'db/conn.php'; // Include database connection
+if (session_status() === PHP_SESSION_NONE)
+    session_start(); // Start session if not already started
 
 $error = '';
 
+// Handle Login Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
 
+    // Basic validation
     if (empty($email) || empty($password)) {
         $error = 'Please enter both email and password.';
     } else {
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch();
+        // SECURE: Use Prepared Statement to prevent SQL Injection
+        $sql = "SELECT * FROM users WHERE email = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
 
+        $result = mysqli_stmt_get_result($stmt);
+        $user = mysqli_fetch_assoc($result);
+
+        // Verify password using password_verify() (checks hash)
         if ($user && password_verify($password, $user['password'])) {
-            // Login successful
+            // Set session variables
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['is_admin'] = $user['is_admin'];
 
+            // Redirect based on role
             if ($user['is_admin']) {
                 header("Location: admin/index.php");
             } else {
@@ -57,31 +54,26 @@ include 'includes/navbar.php';
             <div class="card shadow">
                 <div class="card-body p-5">
                     <h2 class="card-title text-center mb-4">Login</h2>
-                    
+
                     <?php if ($error): ?>
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
 
                     <form method="POST" action="login.php">
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" required>
                         </div>
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" required>
                         </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="remember-me" name="remember_me">
-                            <label class="form-check-label" for="remember-me">
-                                Remember me
-                            </label>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
-                        <div class="text-center">
-                            <p>Don't have an account? <a href="register.php">Register here</a></p>
-                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
                     </form>
+
+                    <div class="text-center mt-3">
+                        <p>Don't have an account? <a href="register.php">Register here</a></p>
+                    </div>
                 </div>
             </div>
         </div>

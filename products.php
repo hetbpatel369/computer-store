@@ -1,29 +1,36 @@
 ﻿<?php
-require_once 'config/db.php';
+// Use the lecture-standard connection file
+require_once 'db/conn.php';
 $pageTitle = 'Products - Computer Store';
 include 'includes/header.php';
 include 'includes/navbar.php';
 
-// Build query
-$where_clauses = [];
+// 1. Build Dynamic Query
+// We start with a base query that selects all products.
+// "WHERE 1=1" is a common trick to make appending "AND" clauses easier.
+$sql = "SELECT * FROM products WHERE 1=1";
+$types = "";
 $params = [];
 
+// Filter by Category
+// Check if 'category' is present in the URL (e.g., products.php?category=laptops)
 if (isset($_GET['category']) && !empty($_GET['category'])) {
-    $where_clauses[] = "category = ?";
-    $params[] = $_GET['category'];
+    $sql .= " AND category = ?"; // Add condition to SQL
+    $types .= "s"; // 's' indicates the parameter is a string
+    $params[] = $_GET['category']; // Add the value to parameters array
 }
 
+// Search Functionality
+// Check if 'search' is present in the URL
 if (isset($_GET['search']) && !empty($_GET['search'])) {
-    $where_clauses[] = "name LIKE ?";
-    $params[] = '%' . $_GET['search'] . '%';
+    $sql .= " AND name LIKE ?";
+    $types .= "s";
+    $params[] = '%' . $_GET['search'] . '%'; // Add wildcards for partial matching
 }
 
-$sql = "SELECT * FROM products";
-if (!empty($where_clauses)) {
-    $sql .= " WHERE " . implode(" AND ", $where_clauses);
-}
-
-// Sort
+// Sorting
+// We use a switch statement to handle different sort options safely.
+// This prevents SQL injection by not inserting user input directly into ORDER BY.
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 switch ($sort) {
     case 'price-low':
@@ -39,124 +46,127 @@ switch ($sort) {
         $sql .= " ORDER BY name DESC";
         break;
     default:
-        $sql .= " ORDER BY id DESC";
+        $sql .= " ORDER BY id DESC"; // Default sort: Newest first
 }
 
-try {
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    $products = $stmt->fetchAll();
-} catch (PDOException $e) {
+// 2. Execute Query using MySQLi Prepared Statements
+// Prepared statements are crucial for security (preventing SQL Injection).
+$stmt = mysqli_prepare($conn, $sql);
+
+if ($stmt) {
+    // Dynamic binding: Only bind parameters if we have any (from filters/search)
+    if (!empty($params)) {
+        mysqli_stmt_bind_param($stmt, $types, ...$params);
+    }
+
+    mysqli_stmt_execute($stmt); // Run the query
+    $result = mysqli_stmt_get_result($stmt); // Get the result set
+    $products = mysqli_fetch_all($result, MYSQLI_ASSOC); // Fetch all rows as an associative array
+} else {
     $products = [];
     $error = "Error loading products.";
 }
 ?>
 
-    <!-- Main Content -->
-    <main class="container my-5">
-        <div class="row">
-            <!-- Sidebar Filters -->
-            <div class="col-md-3 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Categories</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="list-group list-group-flush">
-                            <a href="products.php" class="list-group-item list-group-item-action <?php echo !isset($_GET['category']) ? 'active' : ''; ?>">All Products</a>
-                            <a href="products.php?category=desktops" class="list-group-item list-group-item-action <?php echo (isset($_GET['category']) && $_GET['category'] == 'desktops') ? 'active' : ''; ?>">Desktops</a>
-                            <a href="products.php?category=graphics-cards" class="list-group-item list-group-item-action <?php echo (isset($_GET['category']) && $_GET['category'] == 'graphics-cards') ? 'active' : ''; ?>">Graphics Cards</a>
-                            <a href="products.php?category=memory" class="list-group-item list-group-item-action <?php echo (isset($_GET['category']) && $_GET['category'] == 'memory') ? 'active' : ''; ?>">Memory</a>
-                            <a href="products.php?category=laptops" class="list-group-item list-group-item-action <?php echo (isset($_GET['category']) && $_GET['category'] == 'laptops') ? 'active' : ''; ?>">Laptops</a>
-                            <a href="products.php?category=accessories" class="list-group-item list-group-item-action <?php echo (isset($_GET['category']) && $_GET['category'] == 'accessories') ? 'active' : ''; ?>">Accessories</a>
+<main class="container my-5">
+    <div class="row">
+        <!-- Sidebar: Categories -->
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Categories</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <!-- Links to filter products by category -->
+                    <a href="products.php" class="list-group-item list-group-item-action">All Products</a>
+                    <a href="products.php?category=desktops" class="list-group-item list-group-item-action">Desktops</a>
+                    <a href="products.php?category=laptops" class="list-group-item list-group-item-action">Laptops</a>
+                    <a href="products.php?category=graphics-cards"
+                        class="list-group-item list-group-item-action">Graphics Cards</a>
+                    <a href="products.php?category=memory" class="list-group-item list-group-item-action">Memory</a>
+                    <a href="products.php?category=accessories"
+                        class="list-group-item list-group-item-action">Accessories</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content: Product Grid -->
+        <div class="col-md-9">
+            <!-- Search and Sort Controls -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form action="products.php" method="GET" class="row g-3">
+                        <!-- Search Input -->
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="search" placeholder="Search products..."
+                                value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
                         </div>
-                    </div>
+                        <!-- Sort Dropdown -->
+                        <div class="col-md-4">
+                            <select class="form-select" name="sort" onchange="this.form.submit()">
+                                <option value="default">Sort by: Default</option>
+                                <option value="price-low" <?php echo $sort == 'price-low' ? 'selected' : ''; ?>>Price: Low
+                                    to High</option>
+                                <option value="price-high" <?php echo $sort == 'price-high' ? 'selected' : ''; ?>>Price:
+                                    High to Low</option>
+                            </select>
+                        </div>
+                        <!-- Preserve category filter if it exists -->
+                        <?php if (isset($_GET['category'])): ?>
+                            <input type="hidden" name="category" value="<?php echo htmlspecialchars($_GET['category']); ?>">
+                        <?php endif; ?>
+                    </form>
                 </div>
             </div>
 
-            <!-- Products Section -->
-            <div class="col-md-9">
-                <!-- Search and Sort -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3 mb-md-0">
-                                <form action="products.php" method="GET">
-                                    <?php if(isset($_GET['category'])): ?>
-                                        <input type="hidden" name="category" value="<?php echo htmlspecialchars($_GET['category']); ?>">
-                                    <?php endif; ?>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" name="search" placeholder="Search products..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
-                                        <button class="btn btn-primary" type="submit">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="col-md-6">
-                                <form action="products.php" method="GET" id="sortForm">
-                                    <?php if(isset($_GET['category'])): ?>
-                                        <input type="hidden" name="category" value="<?php echo htmlspecialchars($_GET['category']); ?>">
-                                    <?php endif; ?>
-                                    <?php if(isset($_GET['search'])): ?>
-                                        <input type="hidden" name="search" value="<?php echo htmlspecialchars($_GET['search']); ?>">
-                                    <?php endif; ?>
-                                    <select class="form-select" name="sort" onchange="document.getElementById('sortForm').submit()">
-                                        <option value="default" <?php echo $sort == 'default' ? 'selected' : ''; ?>>Sort by: Default</option>
-                                        <option value="price-low" <?php echo $sort == 'price-low' ? 'selected' : ''; ?>>Price: Low to High</option>
-                                        <option value="price-high" <?php echo $sort == 'price-high' ? 'selected' : ''; ?>>Price: High to Low</option>
-                                        <option value="name-asc" <?php echo $sort == 'name-asc' ? 'selected' : ''; ?>>Name: A to Z</option>
-                                        <option value="name-desc" <?php echo $sort == 'name-desc' ? 'selected' : ''; ?>>Name: Z to A</option>
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
+            <!-- Products Grid -->
+            <div class="row g-4">
+                <?php if (empty($products)): ?>
+                    <div class="col-12">
+                        <p class="text-center">No products found.</p>
                     </div>
-                </div>
-
-                <!-- Products Grid -->
-                <div class="row" id="products-container">
-                    <?php if (empty($products)): ?>
-                        <div class="col-12 text-center">
-                            <p>No products found.</p>
-                        </div>
-                    <?php else: ?>
-                        <?php foreach ($products as $product): ?>
-                        <div class="col-md-6 col-lg-4 mb-4">
+                <?php else: ?>
+                    <?php foreach ($products as $product): ?>
+                        <div class="col-md-6 col-lg-4">
                             <div class="card h-100 product-card">
-                                <img src="<?php echo htmlspecialchars($product['image_url']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($product['name']); ?>" style="height: 250px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/400x300?text=Product+Image'">
+                                <!-- Product Image Link -->
+                                <a href="product.php?id=<?php echo $product['id']; ?>" class="text-decoration-none text-dark">
+                                    <img src="<?php echo htmlspecialchars($product['image_url']); ?>" class="card-img-top"
+                                        style="height: 250px; object-fit: cover;">
+                                </a>
                                 <div class="card-body d-flex flex-column">
-                                    <h5 class="card-title"><?php echo htmlspecialchars($product['name']); ?></h5>
-                                    <p class="card-text text-muted flex-grow-1"><?php echo htmlspecialchars(substr($product['description'], 0, 100)) . '...'; ?></p>
+                                    <!-- Product Name Link -->
+                                    <a href="product.php?id=<?php echo $product['id']; ?>"
+                                        class="text-decoration-none text-dark">
+                                        <h5 class="card-title"><?php echo htmlspecialchars($product['name']); ?></h5>
+                                    </a>
+                                    <!-- Description Truncated -->
+                                    <p class="card-text text-muted">
+                                        <?php echo htmlspecialchars(substr($product['description'], 0, 80)) . '...'; ?>
+                                    </p>
                                     <div class="mt-auto">
-                                        <p class="card-text">
-                                            <strong class="text-primary">$<?php echo number_format($product['price'], 2); ?></strong>
-                                            <?php if ($product['stock'] > 0): ?>
-                                                <span class="badge bg-success ms-2">In Stock</span>
-                                            <?php else: ?>
-                                                <span class="badge bg-danger ms-2">Out of Stock</span>
-                                            <?php endif; ?>
-                                        </p>
-                                    <div class="d-flex gap-2">
-                                        <a href="product.php?id=<?php echo $product['id']; ?>" class="btn btn-outline-primary flex-grow-1">Details</a>
-                                        <form action="cart_actions.php" method="POST" class="flex-grow-1">
-                                            <input type="hidden" name="action" value="add">
-                                            <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                                            <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="btn btn-primary w-100" <?php echo $product['stock'] <= 0 ? 'disabled' : ''; ?>>
-                                                <i class="fas fa-cart-plus"></i> Add
-                                            </button>
-                                        </form>
-                                    </div>
+                                        <h5 class="text-primary mb-3">$<?php echo number_format($product['price'], 2); ?></h5>
+                                        <div class="d-grid gap-2">
+                                            <!-- View Details Button -->
+                                            <a href="product.php?id=<?php echo $product['id']; ?>"
+                                                class="btn btn-outline-primary">Details</a>
+                                            <!-- Add to Cart Form -->
+                                            <form action="cart_actions.php" method="POST">
+                                                <input type="hidden" name="action" value="add">
+                                                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
 <?php include 'includes/footer.php'; ?>

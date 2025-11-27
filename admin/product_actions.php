@@ -1,9 +1,9 @@
 <?php
-require_once '../config/db.php';
+require_once '../db/conn.php';
 session_start();
 
-// Check if user is admin
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+// Security Check: Ensure user is logged in and is an admin
+if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
     header("Location: ../login.php");
     exit;
 }
@@ -11,53 +11,63 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['
 $action = $_POST['action'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    try {
-        if ($action === 'add') {
-            $name = $_POST['name'];
-            $description = $_POST['description'];
-            $price = $_POST['price'];
-            $stock = $_POST['stock'];
-            $category = $_POST['category'];
-            $image_url = $_POST['image_url'];
 
-            $stmt = $pdo->prepare("INSERT INTO products (name, description, price, stock, category, image_url) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$name, $description, $price, $stock, $category, $image_url]);
+    // --- ADD PRODUCT ---
+    if ($action === 'add') {
+        $name = $_POST['name'];
+        $desc = $_POST['description'];
+        $price = $_POST['price'];
+        $stock = $_POST['stock'];
+        $cat = $_POST['category'];
+        $img = $_POST['image_url'];
 
-            header("Location: products.php?success=Product added successfully");
-            exit;
+        // Use Prepared Statement to prevent SQL Injection
+        $sql = "INSERT INTO products (name, description, price, stock, category, image_url) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = mysqli_prepare($conn, $sql);
+        // Bind parameters: s=string, d=double(decimal), i=integer
+        mysqli_stmt_bind_param($stmt, "ssdiss", $name, $desc, $price, $stock, $cat, $img);
 
-        } elseif ($action === 'edit') {
-            $id = $_POST['id'];
-            $name = $_POST['name'];
-            $description = $_POST['description'];
-            $price = $_POST['price'];
-            $stock = $_POST['stock'];
-            $category = $_POST['category'];
-            $image_url = $_POST['image_url'];
-
-            $stmt = $pdo->prepare("UPDATE products SET name = ?, description = ?, price = ?, stock = ?, category = ?, image_url = ? WHERE id = ?");
-            $stmt->execute([$name, $description, $price, $stock, $category, $image_url, $id]);
-
-            header("Location: products.php?success=Product updated successfully");
-            exit;
-
-        } elseif ($action === 'delete') {
-            $id = $_POST['id'];
-            
-            // Optional: Check if product is in any orders before deleting?
-            // For now, we'll just delete it.
-            $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
-            $stmt->execute([$id]);
-
-            header("Location: products.php?success=Product deleted successfully");
-            exit;
+        if (mysqli_stmt_execute($stmt)) {
+            header("Location: products.php?success=Product+added+successfully");
+        } else {
+            echo "Error: " . mysqli_error($conn);
         }
-    } catch (PDOException $e) {
-        header("Location: products.php?error=" . urlencode($e->getMessage()));
-        exit;
+    }
+
+    // --- DELETE PRODUCT ---
+    elseif ($action === 'delete') {
+        $id = $_POST['id'];
+
+        $sql = "DELETE FROM products WHERE id = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $id);
+
+        if (mysqli_stmt_execute($stmt)) {
+            header("Location: products.php?success=Product+deleted+successfully");
+        } else {
+            echo "Error: " . mysqli_error($conn);
+        }
+    }
+
+    // --- EDIT PRODUCT ---
+    elseif ($action === 'edit') {
+        $id = $_POST['id'];
+        $name = $_POST['name'];
+        $desc = $_POST['description'];
+        $price = $_POST['price'];
+        $stock = $_POST['stock'];
+        $cat = $_POST['category'];
+        $img = $_POST['image_url'];
+
+        $sql = "UPDATE products SET name=?, description=?, price=?, stock=?, category=?, image_url=? WHERE id=?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "ssdissi", $name, $desc, $price, $stock, $cat, $img, $id);
+
+        if (mysqli_stmt_execute($stmt)) {
+            header("Location: products.php?success=Product+updated+successfully");
+        } else {
+            echo "Error: " . mysqli_error($conn);
+        }
     }
 }
-
-header("Location: products.php");
-exit;
 ?>

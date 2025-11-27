@@ -1,69 +1,83 @@
 <?php
+// Ensure session is started to check login status
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 ?>
 <header>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="index.php">
-            <i class="fas fa-desktop"></i> Computer Store
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>" href="index.php">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'products.php' ? 'active' : ''; ?>" href="products.php">Products</a>
-                </li>
-            </ul>
-            <ul class="navbar-nav">
-                <li class="nav-item d-flex align-items-center">
-                    <div class="btn-group" role="group" aria-label="Theme switcher">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-theme-value="light">Light</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-theme-value="dark">Dark</button>
-                    </div>
-                </li>
-                
-                <?php if (isset($_SESSION['user_id'])): ?>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION['user_name']); ?>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="order-history.php">Order History</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                        </ul>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+        <div class="container-fluid position-relative">
+            <!-- Brand Logo (Left) -->
+            <a class="navbar-brand fw-bold text-uppercase" href="index.php" style="padding: 0 10px;">
+                <i class="fas fa-laptop-code me-2"></i>Next Gen Tech
+            </a>
+
+            <!-- Mobile Toggle Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Centered Links (Home, Products) -->
+                <ul class="navbar-nav centered-nav">
+                    <li class="nav-item">
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>"
+                            href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="cart.php">
-                            <i class="fas fa-shopping-cart"></i> Cart
-                            <!-- Cart count could be implemented here with another query -->
+                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'products.php' ? 'active' : ''; ?>"
+                            href="products.php">Products</a>
+                    </li>
+                </ul>
+
+                <!-- Right Side: User Menu & Cart -->
+                <ul class="navbar-nav ms-auto align-items-center" style="padding: 0 10px;">
+                    <!-- Cart Icon -->
+                    <li class="nav-item me-3">
+                        <a class="nav-link position-relative" href="cart.php">
+                            <i class="fas fa-shopping-cart fa-lg"></i>
+                            <!-- Show badge if items are in cart (Optional logic could go here) -->
                         </a>
                     </li>
-                    <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="admin/index.php">
-                            <i class="fas fa-cog"></i> Admin
-                        </a>
-                    </li>
+
+                    <!-- User Dropdown / Login Links -->
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
+                                role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle fa-lg me-2"></i>
+                                <?php echo htmlspecialchars($_SESSION['user_name']); ?>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+                                    <li><a class="dropdown-item" href="admin/index.php">Admin Panel</a></li>
+                                <?php endif; ?>
+                                <li><a class="dropdown-item" href="order-history.php">Order History</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item text-danger" href="logout.php">Logout</a></li>
+                            </ul>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-light btn-sm px-3 ms-2" href="login.php">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-primary btn-sm px-3 ms-2 text-white" href="register.php">Register</a>
+                        </li>
                     <?php endif; ?>
-                <?php else: ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="login.php">Login</a>
+
+                    <!-- Dark Mode Toggle -->
+                    <li class="nav-item ms-3">
+                        <button class="btn btn-link nav-link" id="darkModeToggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="register.php">Register</a>
-                    </li>
-                <?php endif; ?>
-            </ul>
+                </ul>
+            </div>
         </div>
-    </div>
     </nav>
 </header>

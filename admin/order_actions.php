@@ -1,33 +1,31 @@
 <?php
-require_once '../config/db.php';
+require_once '../db/conn.php';
 session_start();
 
-// Check if user is admin
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+// Security Check: Ensure user is logged in and is an admin
+if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
     header("Location: ../login.php");
     exit;
 }
 
-$action = $_POST['action'] ?? '';
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    try {
-        if ($action === 'update_status') {
-            $order_id = $_POST['order_id'];
-            $status = $_POST['status'];
+    $action = $_POST['action'] ?? '';
 
-            $stmt = $pdo->prepare("UPDATE orders SET status = ? WHERE id = ?");
-            $stmt->execute([$status, $order_id]);
+    // --- UPDATE ORDER STATUS ---
+    if ($action === 'update_status') {
+        $order_id = $_POST['order_id'];
+        $status = $_POST['status'];
 
-            header("Location: orders.php?success=Order status updated successfully");
-            exit;
+        // Use Prepared Statement to update status
+        $sql = "UPDATE orders SET status = ? WHERE id = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "si", $status, $order_id);
+
+        if (mysqli_stmt_execute($stmt)) {
+            header("Location: orders.php?success=Order+status+updated");
+        } else {
+            header("Location: orders.php?error=Failed+to+update+status");
         }
-    } catch (PDOException $e) {
-        header("Location: orders.php?error=" . urlencode($e->getMessage()));
-        exit;
     }
 }
-
-header("Location: orders.php");
-exit;
 ?>

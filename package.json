@@ -1,15 +1,23 @@
 {
   "name": "computer-store",
   "version": "1.0.0",
-  "description": "A full-featured e-commerce website for computer products built with HTML5, Bootstrap, and JavaScript. This frontend is designed to be easily ported to PHP/MySQL backend.",
-  "main": "index.js",
-  "scripts": {},
-  "keywords": [],
-  "author": "",
+  "description": "Online Computer store for internet tools.",
+  "keywords": [
+    "OnlineComputerStore"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hetbpatel369/computer-store.git"
+  },
   "license": "ISC",
+  "author": "Het, Zenil, Pranjal",
   "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "compile" : "sass --watch --no-source-map scss:css"
+  },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.1.0",
-    "bootstrap": "^5.3.0"
+    "bootstrap": "^5.3.8",
+    "sass": "^1.94.2"
   }
 }
