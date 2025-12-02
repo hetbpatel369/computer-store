@@ -6,14 +6,6 @@ if (session_status() === PHP_SESSION_NONE) {
 ?>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
-<?php
-// Only start the session if one hasn't been started yet
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-?>
-<!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
 
 <head>
     <meta charset="UTF-8">

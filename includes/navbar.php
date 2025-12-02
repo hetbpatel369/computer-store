@@ -63,7 +63,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-outline-light btn-sm px-3 ms-2" href="login.php">Login</a>
+                            <a class="nav-link btn btn-primary btn-sm px-3 ms-2 text-white" href="login.php">Login</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link btn btn-primary btn-sm px-3 ms-2 text-white" href="register.php">Register</a>

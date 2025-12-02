@@ -16,40 +16,12 @@
   min-width: 100%;
   min-height: 100%;
   width: auto;
-  height: auto;
-  z-index: -1;
-  transform: translate(-50%, -50%);
-  object-fit: cover;
-}
-
-.hero-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 0;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-    z-index: 10;
-}
-
-/* Navbar Centering */
-@media (min-width: 992px) {
-    .centered-nav {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
     }
-}
 
-/* Dark Mode Overrides */
-[data-bs-theme="dark"] {
+    h1, h2, h3, h4, h5, h6, p, span, li, div {
+        color: #f8f9fa;
+    }
+
     .bg-light {
         background-color: #212529 !important; /* Dark background for sections */
     }
@@ -74,4 +46,51 @@
     .text-dark {
         color: #f8f9fa !important;
     }
-}
+
+    a {
+        color: #6ea8fe; /* Lighter link color for dark mode */
+        &:hover {
+            color: #8bb9fe;
+        }
+    }
+
+    .navbar-light .navbar-nav .nav-link {
+        color: rgba(255, 255, 255, 0.8);
+        &:hover {
+            color: #fff;
+        }
+    }
+    
+    .dropdown-menu {
+        background-color: #343a40;
+        border-color: #495057;
+        .dropdown-item {
+            color: #dee2e6;
+            &:hover {
+                background-color: #495057;
+                color: #fff;
+            }
+        }
+    }
+
+    .form-control {
+        background-color: #212529;
+        border-color: #495057;
+        color: #f8f9fa;
+        &:focus {
+            background-color: #212529;
+            color: #f8f9fa;
+            border-color: #86b7fe;
+        }
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+        &:hover {
+            background-color: #0b5ed7 !important;
+            border-color: #0a58ca !important;
+            color: #fff !important; /* Ensure text stays white on hover */
+        }
+    }
