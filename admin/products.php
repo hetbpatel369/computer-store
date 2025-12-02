@@ -70,7 +70,7 @@ include '../includes/admin_navbar.php';
                             <tr>
                                 <td><?php echo $product['id']; ?></td>
                                 <td><img src="../<?php echo htmlspecialchars($product['image_url']); ?>" width="50"
-                                        height="50" style="object-fit: cover;"></td>
+                                        height="50" style="object-fit: contain; background-color: white;"></td>
                                 <td><?php echo htmlspecialchars($product['name']); ?></td>
                                 <td><?php echo ucfirst($product['category']); ?></td>
                                 <td>$<?php echo number_format($product['price'], 2); ?></td>

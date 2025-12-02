@@ -44,7 +44,7 @@ include 'includes/navbar.php'; // Include Navigation bar
                                 <a href="product.php?id=<?php echo $product['id']; ?>" class="text-decoration-none text-dark">
                                     <div class="overflow-hidden">
                                         <img src="<?php echo htmlspecialchars($product['image_url']); ?>" class="card-img-top"
-                                            style="height: 200px; object-fit: cover;">
+                                            style="height: 200px; object-fit: contain; background-color: white;">
                                     </div>
                                 </a>
                                 <!-- Product Details -->

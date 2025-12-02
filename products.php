@@ -132,7 +132,7 @@ if ($stmt) {
                                 <!-- Product Image Link -->
                                 <a href="product.php?id=<?php echo $product['id']; ?>" class="text-decoration-none text-dark">
                                     <img src="<?php echo htmlspecialchars($product['image_url']); ?>" class="card-img-top"
-                                        style="height: 250px; object-fit: cover;">
+                                        style="height: 250px; object-fit: contain; background-color: white;">
                                 </a>
                                 <div class="card-body d-flex flex-column">
                                     <!-- Product Name Link -->
