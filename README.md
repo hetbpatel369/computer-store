@@ -37,7 +37,10 @@ Next Gen Tech is a web-based e-commerce application designed for selling high-pe
     - Start **Apache** and **MySQL** from the XAMPP Control Panel.
     - Open **phpMyAdmin** (`http://localhost/phpmyadmin`).
     - Create a new database named `computer_store`.
-    - Import the database schema (if provided) or ensure the necessary tables (`users`, `products`, etc.) exist.
+    - Click on the `computer_store` database in the left sidebar.
+    - Go to the **Import** tab.
+    - Click **Choose File** and select `database/computer_store.sql` from the project directory.
+    - Click **Import** at the bottom of the page.
 
 3.  **Configuration:**
 
@@ -60,12 +63,14 @@ Next Gen Tech is a web-based e-commerce application designed for selling high-pe
 - **Login:** Access your account to view your cart and order history.
 - **Admin:** Log in with an admin account to access the dashboard at `/admin/index.php`.
 
-Admin Login Credentials:
+### Default Credentials
 
-Username: admin@admin.com
-Password: admin123
+**Admin User:**
 
-User Login Credentials:
+- **Email:** `admin@example.com`
+- **Password:** `password`
 
-Username: demo@demo.com
-Password: demo123
+**Regular User:**
+
+- **Email:** `user@example.com`
+- **Password:** `password`

@@ -12,69 +12,51 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-$action  = $_POST['action'] ?? '';
-
-// Debug logging - log every request
-$logFile = __DIR__ . '/order_actions.log';
-$logData = sprintf(
-    "[%s] REQUEST_METHOD=%s, action=%s, order_id=%s, user_id=%d\n",
-    date('Y-m-d H:i:s'),
-    $_SERVER['REQUEST_METHOD'],
-    $action,
-    $_POST['order_id'] ?? 'none',
-    $user_id
-);
-file_put_contents($logFile, $logData, FILE_APPEND);
+$action = $_POST['action'] ?? '';
 
 // Handle order cancellation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'cancel') {
     $order_id = $_POST['order_id'] ?? '';
-    
-    file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Entering cancel logic for order_id=$order_id\n", FILE_APPEND);
 
     if (empty($order_id)) {
-        file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] ERROR: Empty order_id\n", FILE_APPEND);
         header('Location: order-history.php?error=Invalid+order+ID');
         exit;
     }
 
-    try {
-        // Verify the order belongs to the current user
-        $stmt = $pdo->prepare("SELECT id, status FROM orders WHERE id = ? AND user_id = ?");
-        $stmt->execute([$order_id, $user_id]);
-        $order = $stmt->fetch();
-        
-        file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Order found: " . ($order ? "YES (status={$order['status']})" : "NO") . "\n", FILE_APPEND);
+    // Verify the order belongs to the current user
+    $sql = "SELECT id, status FROM orders WHERE id = ? AND user_id = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "ii", $order_id, $user_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $order = mysqli_fetch_assoc($result);
 
-        if (!$order) {
-            header('Location: order-history.php?error=Order+not+found');
-            exit;
-        }
-
-        // Only allow cancellation for pending/completed orders
-        if (in_array($order['status'], ['pending', 'completed'])) {
-            $stmt = $pdo->prepare("UPDATE orders SET status = 'cancelled' WHERE id = ?");
-            $stmt->execute([$order_id]);
-            
-            file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Order $order_id cancelled successfully\n", FILE_APPEND);
-
-            header('Location: order-history.php?success=Order+cancelled+successfully');
-            exit;
-        }
-
-        // If status is delivered or already cancelled
-        file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Order cannot be cancelled (status={$order['status']})\n", FILE_APPEND);
-        header('Location: order-history.php?error=Order+cannot+be+cancelled');
-        exit;
-    } catch (PDOException $e) {
-        file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] DATABASE ERROR: " . $e->getMessage() . "\n", FILE_APPEND);
-        header('Location: order-history.php?error=' . urlencode($e->getMessage()));
+    if (!$order) {
+        header('Location: order-history.php?error=Order+not+found');
         exit;
     }
+
+    // Only allow cancellation for pending/completed orders
+    if (in_array($order['status'], ['pending', 'completed'])) {
+        $update_sql = "UPDATE orders SET status = 'cancelled' WHERE id = ?";
+        $update_stmt = mysqli_prepare($conn, $update_sql);
+        mysqli_stmt_bind_param($update_stmt, "i", $order_id);
+
+        if (mysqli_stmt_execute($update_stmt)) {
+            header('Location: order-history.php?success=Order+cancelled+successfully');
+            exit;
+        } else {
+            header('Location: order-history.php?error=Failed+to+cancel+order');
+            exit;
+        }
+    }
+
+    // If status is delivered or already cancelled
+    header('Location: order-history.php?error=Order+cannot+be+cancelled');
+    exit;
 }
 
-// Fallback - log and redirect
-file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Fallback redirect (no action matched)\n", FILE_APPEND);
+// Fallback redirect
 header('Location: order-history.php');
 exit;
 ?>

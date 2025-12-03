@@ -38,7 +38,6 @@ if (session_status() === PHP_SESSION_NONE) {
                     <li class="nav-item me-3">
                         <a class="nav-link position-relative" href="cart.php">
                             <i class="fas fa-shopping-cart fa-lg"></i>
-                            <!-- Show badge if items are in cart (Optional logic could go here) -->
                         </a>
                     </li>
 
@@ -63,22 +62,22 @@ if (session_status() === PHP_SESSION_NONE) {
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-primary btn-sm px-3 ms-2 text-white" href="login.php">Login</a>
+                            <a class="nav-link btn btn-outline-primary btn-sm px-3 ms-2" href="login.php">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-primary btn-sm px-3 ms-2 text-white" href="register.php">Register</a>
+                            <a class="nav-link btn btn-outline-primary btn-sm px-3 ms-2" href="register.php">Register</a>
                         </li>
                     <?php endif; ?>
 
                     <!-- Dark Mode Toggle -->
-                    <li class="nav-item me-3">
-                    <div class="btn-group" role="group" aria-label="Theme switcher">
-                        <button type="button" class="btn btn-sm btn-outline-secondary"
-                            data-bs-theme-value="light">Light</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary"
-                            data-bs-theme-value="dark">Dark</button>
-                    </div>
-                </li>
+                    <li class="nav-item me-3 ms-3">
+                        <div class="btn-group" role="group" aria-label="Theme switcher">
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                data-bs-theme-value="light">Light</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                data-bs-theme-value="dark">Dark</button>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>

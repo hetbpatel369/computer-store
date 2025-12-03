@@ -28,14 +28,19 @@ include 'includes/navbar.php'; // Include Navigation bar
         <h2 class="text-center mb-5 fw-bold">Featured Products</h2>
         <div class="row g-4" id="featured-products">
             <?php
-            // SQL Query to fetch 4 products for the featured section
+            // --- FETCH FEATURED PRODUCTS ---
+            // We want to display a few products on the home page to attract users.
+            // The LIMIT 4 clause ensures we only get the first 4 products.
             $sql = "SELECT * FROM products LIMIT 4";
             $result = mysqli_query($conn, $sql);
 
+            // Check if the query was successful
             if ($result) {
+                // Check if any products were returned
                 if (mysqli_num_rows($result) > 0) {
-                    // Loop through each product found in the database
+                    // Loop through each row (product) in the result set
                     while ($product = mysqli_fetch_assoc($result)) {
+                        // We use htmlspecialchars() to prevent XSS attacks when outputting data
                         ?>
                         <!-- Product Card -->
                         <div class="col-md-6 col-lg-3">
@@ -66,15 +71,13 @@ include 'includes/navbar.php'; // Include Navigation bar
                     echo '<p class="text-center">No products found.</p>';
                 }
             } else {
-                // Display error if query fails
+                // Display error if query fails (useful for debugging)
                 echo "Error: " . mysqli_error($conn);
             }
             ?>
         </div>
     </div>
 </section>
-
-<!-- About Us Section -->
 <section class="py-5">
     <div class="container">
         <div class="row align-items-center">

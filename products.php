@@ -6,30 +6,34 @@ include 'includes/header.php';
 include 'includes/navbar.php';
 
 // Fetch Categories for Filter Dropdown
+// We fetch distinct categories to populate the filter dropdown dynamically
 $cat_sql = "SELECT DISTINCT category FROM products ORDER BY category ASC";
 $cat_result = mysqli_query($conn, $cat_sql);
 $categories = mysqli_fetch_all($cat_result, MYSQLI_ASSOC);
 
-// 1. Build Dynamic Query
+// --- BUILD DYNAMIC SQL QUERY ---
+// We start with a base query that selects all products.
+// "WHERE 1=1" is a common trick to make appending "AND" conditions easier.
 $sql = "SELECT * FROM products WHERE 1=1";
-$types = "";
-$params = [];
+$types = ""; // String to hold parameter types (s=string, i=integer, d=double)
+$params = []; // Array to hold the actual parameter values
 
-// Filter by Category
+// 1. Filter by Category
 if (isset($_GET['category']) && !empty($_GET['category'])) {
     $sql .= " AND category = ?";
     $types .= "s";
     $params[] = $_GET['category'];
 }
 
-// Search Functionality
+// 2. Search Functionality
+// We use the LIKE operator with wildcards (%) to find partial matches
 if (isset($_GET['search']) && !empty($_GET['search'])) {
     $sql .= " AND name LIKE ?";
     $types .= "s";
     $params[] = '%' . $_GET['search'] . '%';
 }
 
-// Filter by Price Range
+// 3. Filter by Price Range
 if (isset($_GET['min_price']) && is_numeric($_GET['min_price'])) {
     $sql .= " AND price >= ?";
     $types .= "d";
@@ -41,12 +45,13 @@ if (isset($_GET['max_price']) && is_numeric($_GET['max_price'])) {
     $params[] = $_GET['max_price'];
 }
 
-// Filter by Availability (In Stock)
+// 4. Filter by Availability (In Stock)
 if (isset($_GET['in_stock']) && $_GET['in_stock'] == '1') {
     $sql .= " AND stock > 0";
 }
 
-// Sorting
+// 5. Sorting
+// We check the 'sort' GET parameter and append the appropriate ORDER BY clause
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 switch ($sort) {
     case 'price-low':
@@ -65,10 +70,12 @@ switch ($sort) {
         $sql .= " ORDER BY id DESC"; // Default sort: Newest first
 }
 
-// 2. Execute Query using MySQLi Prepared Statements
+// --- EXECUTE QUERY ---
+// We use prepared statements to prevent SQL injection, especially since we are dealing with user input.
 $stmt = mysqli_prepare($conn, $sql);
 
 if ($stmt) {
+    // Dynamically bind parameters if any exist
     if (!empty($params)) {
         mysqli_stmt_bind_param($stmt, $types, ...$params);
     }

@@ -14,7 +14,7 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "compile" : "sass --watch --no-source-map scss:css"
+    "compile": "sass --watch --no-source-map scss:css"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
