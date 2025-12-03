@@ -33,7 +33,7 @@ CREATE TABLE `cart` (
   KEY `product_id` (`product_id`),
   CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -63,7 +63,7 @@ CREATE TABLE `order_items` (
   KEY `product_id` (`product_id`),
   CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
   CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -97,7 +97,7 @@ CREATE TABLE `orders` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -126,7 +126,7 @@ CREATE TABLE `products` (
   `stock` int(11) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,7 +135,38 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'Gaming Desktop PC - RTX 4080','High-performance gaming desktop with NVIDIA RTX 4080, Intel i7-13700K, 32GB DDR5 RAM, 1TB NVMe SSD',2499.99,'img/products/Gaming Desktop PC.webp','desktops',20,'2025-11-20 16:12:53'),(2,'Workstation Desktop - Professional','Professional workstation with AMD Ryzen 9 7950X, 64GB DDR5 RAM, 2TB NVMe SSD, NVIDIA RTX A4000',3499.99,'img/products/Workstation Desktop.jpg','desktops',8,'2025-11-20 16:12:53'),(3,'Budget Desktop PC','Affordable desktop with Intel i5-12400, 16GB DDR4 RAM, 512GB SSD, Integrated Graphics',699.99,'img/products/Budget Desktop PC.jpg','desktops',24,'2025-11-20 16:12:53'),(4,'NVIDIA GeForce RTX 4090','24GB GDDR6X, 384-bit, Ray Tracing, DLSS 3.0, PCIe 4.0',1599.99,'img/products/NVIDIA GeForce RTX 4090.webp','graphics-cards',12,'2025-11-20 16:12:53'),(5,'NVIDIA GeForce RTX 4080','16GB GDDR6X, 256-bit, Ray Tracing, DLSS 3.0, PCIe 4.0',1199.99,'img/products/NVIDIA GeForce RTX 4080.png','graphics-cards',18,'2025-11-20 16:12:53'),(6,'AMD Radeon RX 7900 XTX','24GB GDDR6, 384-bit, Ray Tracing, FSR 3.0, PCIe 4.0',999.99,'img/products/AMD Radeon RX 7900 XTX.png','graphics-cards',20,'2025-11-20 16:12:53'),(7,'NVIDIA GeForce RTX 4070','12GB GDDR6X, 192-bit, Ray Tracing, DLSS 3.0, PCIe 4.0',599.99,'img/products/NVIDIA GeForce RTX 4070.jpg','graphics-cards',30,'2025-11-20 16:12:53'),(8,'Corsair Vengeance DDR5 32GB (2x16GB)','DDR5 5600MHz, CL36, RGB Lighting, Intel XMP 3.0',129.99,'img/products/Corsair Vengeance DDR5 32GB.avif','memory',50,'2025-11-20 16:12:53'),(9,'G.Skill Trident Z5 DDR5 64GB (2x32GB)','DDR5 6000MHz, CL30, RGB Lighting, AMD EXPO & Intel XMP',249.99,'img/products/G.Skill Trident Z5 DDR5 64GB.jpg','memory',35,'2025-11-20 16:12:53'),(10,'Corsair Vengeance LPX DDR4 16GB (2x8GB)','DDR4 3200MHz, CL16, Low Profile, Intel XMP 2.0',59.99,'img/products/Corsair Vengeance LPX DDR4 16GB.jpg','memory',75,'2025-11-20 16:12:53'),(11,'Kingston Fury Beast DDR4 32GB (2x16GB)','DDR4 3600MHz, CL18, RGB Lighting, Plug and Play',99.99,'img/products/Kingston Fury Beast DDR4 32GB.jpg','memory',60,'2025-11-20 16:12:53'),(12,'Gaming Laptop - RTX 4070','17.3\" FHD 144Hz, Intel i7-13700HX, RTX 4070, 32GB DDR5, 1TB SSD',1899.99,'img/products/Gaming Laptop - RTX 4070.jpg','laptops',10,'2025-11-20 16:12:53'),(13,'Business Laptop - Ultrabook','14\" 2K Display, Intel i7-1355U, 16GB LPDDR5, 512GB SSD, 12hr Battery',1299.99,'img/products/Business Laptop - Ultrabook.jpg','laptops',15,'2025-11-20 16:12:53'),(14,'Budget Laptop','15.6\" FHD, AMD Ryzen 5 7530U, 8GB DDR4, 256GB SSD, Integrated Graphics',499.99,'img/products/Budget Laptop.webp','laptops',20,'2025-11-20 16:12:53'),(15,'Mechanical Gaming Keyboard','RGB Backlit, Cherry MX Blue Switches, Full Size, USB-C',129.99,'img/products/Mechanical Gaming Keyboard.jpg','accessories',40,'2025-11-20 16:12:53'),(16,'Wireless Gaming Mouse','RGB Lighting, 16000 DPI, Wireless 2.4GHz, 70hr Battery',79.99,'img/products/Wireless Gaming Mouse.avif','accessories',55,'2025-11-20 16:12:53'),(17,'27\" 4K Gaming Monitor','4K UHD, 144Hz, IPS Panel, HDR400, FreeSync/G-Sync Compatible',449.99,'img/products/4K Gaming Monitor.jpeg','accessories',24,'2025-11-20 16:12:53'),(18,'Gaming Headset','7.1 Surround Sound, RGB Lighting, Noise Cancelling Mic, USB',250.00,'img/products/Gaming Headset.webp','accessories',43,'2025-11-20 16:12:53');
+INSERT INTO `products` VALUES 
+(1,'Apple MacBook Pro 16"','M3 Max chip, 36GB Unified Memory, 1TB SSD, Liquid Retina XDR Display',3499.00,'img/products/macbook-pro-16.jpg','laptops',15,NOW()),
+(2,'Apple iPhone 15 Pro Max','256GB, Titanium Design, A17 Pro Chip, 48MP Main Camera',1199.00,'img/products/iphone-15-pro-max.jpg','smartphones',25,NOW()),
+(3,'Apple iPad Pro 12.9"','M2 chip, 128GB, Wi-Fi, Liquid Retina XDR Display',1099.00,'img/products/ipad-pro-12-9.jpg','tablets',20,NOW()),
+(4,'Apple Watch Ultra 2','49mm Titanium Case, GPS + Cellular, 36-hour Battery Life',799.00,'img/products/apple-watch-ultra-2.jpg','wearables',30,NOW()),
+(5,'Apple AirPods Pro (2nd Gen)','Active Noise Cancellation, Transparency Mode, USB-C Charging Case',249.00,'img/products/airpods-pro-2.jpg','audio',50,NOW()),
+(6,'PlayStation 5 Console','825GB SSD, 4K 120Hz Gaming, DualSense Wireless Controller',499.99,'img/products/ps5-console.jpg','consoles',10,NOW()),
+(7,'Xbox Series X','1TB SSD, 4K 120Hz Gaming, 12 TFLOPS Processing Power',499.99,'img/products/xbox-series-x.jpg','consoles',12,NOW()),
+(8,'PlayStation 5 DualSense Controller','Haptic Feedback, Adaptive Triggers, Built-in Microphone',69.99,'img/products/ps5-controller.jpg','accessories',40,NOW()),
+(9,'Xbox Wireless Controller','Carbon Black, Textured Grip, Bluetooth, Share Button',59.99,'img/products/xbox-controller.jpg','accessories',45,NOW()),
+(10,'Samsung 990 PRO 2TB NVMe SSD','PCIe 4.0, Read Speeds up to 7450 MB/s, Heatsink Included',179.99,'img/products/samsung-990-pro.jpg','storage',30,NOW()),
+(11,'Lian Li O11 Dynamic Evo Case','Mid-Tower, Dual Chamber Design, Tempered Glass, White',159.99,'img/products/lian-li-o11.jpg','components',15,NOW()),
+(12,'Noctua NH-D15 CPU Cooler','Dual Tower, 2x NF-A15 PWM Fans, High Performance Air Cooling',109.95,'img/products/noctua-nh-d15.jpg','components',25,NOW()),
+(13,'Samsung Galaxy S24 Ultra','256GB, Titanium Gray, AI Features, 200MP Camera',1299.99,'img/products/samsung-s24-ultra.jpg','smartphones',20,NOW()),
+(14,'Google Pixel 8 Pro','128GB, Obsidian, Google Tensor G3, Advanced AI Camera',999.00,'img/products/pixel-8-pro.jpg','smartphones',15,NOW()),
+(15,'Dell XPS 15 Laptop','15.6" OLED 3.5K, Intel i9-13900H, RTX 4060, 32GB RAM',2499.00,'img/products/dell-xps-15.jpg','laptops',10,NOW()),
+(16,'Razer Blade 14 Gaming Laptop','14" QHD 240Hz, AMD Ryzen 9 7940HS, RTX 4070, 16GB RAM',2399.99,'img/products/razer-blade-14.jpg','laptops',8,NOW()),
+(17,'Intel Core i9-14900K','24 Cores (8P+16E), up to 6.0 GHz, LGA1700, Unlocked',589.99,'img/products/intel-i9-14900k.jpg','components',30,NOW()),
+(18,'AMD Ryzen 7 7800X3D','8 Cores, 16 Threads, 4.2 GHz, 3D V-Cache Technology',399.00,'img/products/ryzen-7-7800x3d.jpg','components',40,NOW()),
+(19,'ASUS ROG Strix Z790-E Gaming WiFi','LGA1700, DDR5, PCIe 5.0, WiFi 6E, AI Overclocking',499.99,'img/products/asus-z790-motherboard.jpg','components',15,NOW()),
+(20,'Logitech G Pro X Superlight 2','Wireless Gaming Mouse, 2K Polling Rate, 60g Ultra-light',159.00,'img/products/logitech-g-pro-x.jpg','accessories',50,NOW()),
+(21,'SteelSeries Apex Pro TKL','Mechanical Gaming Keyboard, OmniPoint 2.0 Adjustable Switches',189.99,'img/products/steelseries-apex-pro.jpg','accessories',25,NOW()),
+(22,'LG UltraGear 27" OLED Monitor','240Hz, 0.03ms GtG, QHD, G-SYNC Compatible, HDR10',999.99,'img/products/lg-oled-monitor.jpg','accessories',12,NOW()),
+(23,'Sony WH-1000XM5','Wireless Noise Cancelling Headphones, 30hr Battery, Crystal Clear Calls',348.00,'img/products/sony-wh1000xm5.jpg','audio',40,NOW()),
+(24,'Bose QuietComfort Ultra Earbuds','Spatial Audio, World-Class Noise Cancellation, CustomTune',299.00,'img/products/bose-qc-ultra.jpg','audio',35,NOW()),
+(25,'GoPro Hero 12 Black','5.3K60 Video, HyperSmooth 6.0, HDR, Waterproof',399.99,'img/products/gopro-hero-12.jpg','cameras',25,NOW()),
+(26,'Nintendo Switch OLED Model','7-inch OLED Screen, 64GB Storage, Enhanced Audio',349.99,'img/products/nintendo-switch-oled.jpg','consoles',50,NOW()),
+(27,'Steam Deck OLED 1TB','HDR OLED Display, 1TB NVMe SSD, 90Hz Refresh Rate',649.00,'img/products/steam-deck-oled.jpg','consoles',20,NOW()),
+(28,'ASUS ROG Swift 360Hz Monitor','24.5" FHD, 360Hz, 1ms GTG, NVIDIA G-SYNC, Esports Gaming',499.00,'img/products/asus-rog-360hz.jpg','accessories',18,NOW()),
+(29,'Keychron Q1 Pro Mechanical Keyboard','Wireless Custom Mechanical Keyboard, QMK/VIA Support, Aluminum Body',199.00,'img/products/keychron-q1-pro.jpg','accessories',30,NOW()),
+(30,'Razer DeathAdder V3 Pro','63g Ultra-lightweight, 30K Optical Sensor, 90hr Battery',149.99,'img/products/razer-deathadder-v3.jpg','accessories',45,NOW()),
+(31,'Samsung Odyssey Neo G9','49" Curved Gaming Monitor, Mini-LED, 240Hz, 1ms',1299.99,'img/products/samsung-odyssey-g9.jpg','accessories',10,NOW());
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -158,7 +189,7 @@ CREATE TABLE `reviews` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -168,12 +199,38 @@ CREATE TABLE `reviews` (
 LOCK TABLES `reviews` WRITE;
 /*!40000 ALTER TABLE `reviews` DISABLE KEYS */;
 /*!40000 ALTER TABLE `reviews` ENABLE KEYS */;
-INSERT INTO `reviews` (`product_id`, `user_id`, `rating`, `comment`, `created_at`) VALUES 
-(1, 9, 5, 'Absolute beast of a machine! Runs everything on ultra settings.', NOW()),
-(1, 8, 4, 'Great performance, but a bit pricey.', NOW()),
-(17, 9, 5, 'The colors on this monitor are amazing. HDR looks great.', NOW()),
-(17, 8, 5, 'Perfect for gaming and work. 144Hz makes a huge difference.', NOW()),
-(12, 9, 4, 'Solid laptop for the price. Battery life could be better.', NOW());
+INSERT INTO `reviews` (`id`, `product_id`, `user_id`, `rating`, `comment`, `created_at`) VALUES 
+(1, 1, 1, 5, 'The display is stunning and the battery lasts forever.', NOW()),
+(2, 2, 2, 5, 'The camera system is unmatched. Titanium feels premium.', NOW()),
+(3, 3, 1, 5, 'Replaced my laptop for most tasks. M2 chip is crazy fast.', NOW()),
+(4, 4, 2, 5, 'Rugged and reliable. Battery life is a game changer.', NOW()),
+(5, 5, 1, 4, 'Noise cancellation is magic, but they fall out of my ears sometimes.', NOW()),
+(6, 6, 2, 5, 'Loading times are non-existent. The controller is immersive.', NOW()),
+(7, 7, 1, 5, 'Game Pass is the best deal in gaming. Console is whisper quiet.', NOW()),
+(8, 8, 2, 5, 'Haptic feedback adds a whole new layer to gaming.', NOW()),
+(9, 9, 1, 4, 'Solid controller, but I prefer the Elite version.', NOW()),
+(10, 10, 2, 5, 'Blazing fast load times. Worth every penny.', NOW()),
+(11, 11, 1, 5, 'Easiest case I have ever built in. Looks stunning.', NOW()),
+(12, 12, 2, 5, 'Keeps my CPU cool even under heavy load. Silent operation.', NOW()),
+(13, 13, 2, 5, 'The AI features are actually useful. Camera is insane.', NOW()),
+(14, 14, 1, 5, 'Best Android experience hands down. Photos look professional.', NOW()),
+(15, 15, 2, 4, 'Beautiful screen, but gets a bit hot under load.', NOW()),
+(16, 16, 1, 5, 'Perfect balance of power and portability. Build quality is top notch.', NOW()),
+(17, 17, 2, 5, 'Overkill for gaming but amazing for video editing.', NOW()),
+(18, 18, 1, 5, 'The best gaming CPU on the market. Efficiency is unreal.', NOW()),
+(19, 19, 2, 5, 'Feature rich board with great VRMs for overclocking.', NOW()),
+(20, 20, 1, 5, 'So light it feels like holding nothing. Sensor is flawless.', NOW()),
+(21, 21, 2, 4, 'Switches feel great but the software is a bit buggy.', NOW()),
+(22, 22, 1, 5, 'OLED is a game changer. True blacks make everything pop.', NOW()),
+(23, 23, 2, 5, 'Best noise cancelling headphones I have ever used.', NOW()),
+(24, 24, 1, 4, 'Sound quality is amazing, fit is a bit tricky.', NOW()),
+(25, 25, 2, 5, 'HyperSmooth is incredible. Footage looks cinematic.', NOW()),
+(26, 26, 2, 5, 'The OLED screen makes a huge difference. Games look vibrant.', NOW()),
+(27, 27, 1, 5, 'It is like having a gaming PC in your hands. OLED screen is beautiful.', NOW()),
+(28, 28, 2, 5, '360Hz is buttery smooth. Competitive advantage is real.', NOW()),
+(29, 29, 1, 5, 'Typing feel is premium. Aluminum build is heavy and solid.', NOW()),
+(30, 30, 2, 5, 'Perfect shape and weight. My aim has improved.', NOW()),
+(31, 31, 1, 5, 'This monitor is an experience. Immersion is next level.', NOW());
 UNLOCK TABLES;
 
 --
@@ -192,7 +249,7 @@ CREATE TABLE `users` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -201,7 +258,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (8,'Admin User','admin@example.com','$2y$10$5HNPlKBtaBakvJ5ndQzwKeyyopWFSQDQPUSfg27NRD./EwDrhyNti',1,'2025-12-03 17:24:56'),(9,'Regular User','user@example.com','$2y$10$5HNPlKBtaBakvJ5ndQzwKeyyopWFSQDQPUSfg27NRD./EwDrhyNti',0,'2025-12-03 17:24:56');
+INSERT INTO `users` VALUES (1,'Admin User','admin@example.com','$2y$10$5HNPlKBtaBakvJ5ndQzwKeyyopWFSQDQPUSfg27NRD./EwDrhyNti',1,'2025-12-03 17:24:56'),(2,'Regular User','user@example.com','$2y$10$5HNPlKBtaBakvJ5ndQzwKeyyopWFSQDQPUSfg27NRD./EwDrhyNti',0,'2025-12-03 17:24:56');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

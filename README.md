@@ -12,6 +12,8 @@ Next Gen Tech is a web-based e-commerce application designed for selling high-pe
 - **Admin Panel:** Manage products and users (for admin accounts).
 - **Responsive Design:** Optimized for desktop and mobile devices using Bootstrap 5.
 - **Dark Mode:** Toggle between light and dark themes.
+- **Dynamic Filtering:** Filter products by category, price, and availability.
+- **Product Reviews:** Users can leave reviews and ratings for products.
 
 ## Technologies Used
 

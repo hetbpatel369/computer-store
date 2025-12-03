@@ -97,12 +97,13 @@ if ($stmt) {
                     <h5>Categories</h5>
                 </div>
                 <div class="list-group list-group-flush">
-                    <a href="products.php" class="list-group-item list-group-item-action">All Products</a>
-                    <a href="products.php?category=desktops" class="list-group-item list-group-item-action">Desktops</a>
-                    <a href="products.php?category=laptops" class="list-group-item list-group-item-action">Laptops</a>
-                    <a href="products.php?category=graphics-cards" class="list-group-item list-group-item-action">Graphics Cards</a>
-                    <a href="products.php?category=memory" class="list-group-item list-group-item-action">Memory</a>
-                    <a href="products.php?category=accessories" class="list-group-item list-group-item-action">Accessories</a>
+                    <a href="products.php" class="list-group-item list-group-item-action <?php echo !isset($_GET['category']) ? 'active' : ''; ?>">All Products</a>
+                    <?php foreach ($categories as $cat): ?>
+                        <a href="products.php?category=<?php echo urlencode($cat['category']); ?>" 
+                           class="list-group-item list-group-item-action <?php echo (isset($_GET['category']) && $_GET['category'] == $cat['category']) ? 'active' : ''; ?>">
+                            <?php echo ucfirst(str_replace('-', ' ', $cat['category'])); ?>
+                        </a>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
