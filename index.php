@@ -88,7 +88,7 @@ include 'includes/navbar.php';
                 </p>
                 <hr class="w-25 mx-auto mb-4 border-primary" style="opacity: 1; height: 3px;">
                 <p class="text-muted">
-                    This Project Was Developed By Het Patel, Zenil Babaria and Pranjal
+                    This Project Was Developed By Het Patel, Zenil Babaria and Pranjal Patel
                 </p>
             </div>
         </div>
