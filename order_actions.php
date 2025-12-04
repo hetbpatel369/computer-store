@@ -1,8 +1,5 @@
 <?php
-// Start session first, before any output
 session_start();
-
-// Database connection
 require_once 'db/conn.php';
 
 // Check if user is logged in
@@ -14,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $action = $_POST['action'] ?? '';
 
-// Handle order cancellation
+// Handle cancellation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'cancel') {
     $order_id = $_POST['order_id'] ?? '';
 
@@ -23,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'cancel') {
         exit;
     }
 
-    // Verify the order belongs to the current user
+    // Verify order
     $sql = "SELECT id, status FROM orders WHERE id = ? AND user_id = ?";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "ii", $order_id, $user_id);
@@ -36,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'cancel') {
         exit;
     }
 
-    // Only allow cancellation for pending/completed orders
+    // Cancel if pending/completed
     if (in_array($order['status'], ['pending', 'completed'])) {
         $update_sql = "UPDATE orders SET status = 'cancelled' WHERE id = ?";
         $update_stmt = mysqli_prepare($conn, $update_sql);
@@ -51,12 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'cancel') {
         }
     }
 
-    // If status is delivered or already cancelled
+    // Cannot cancel
     header('Location: order-history.php?error=Order+cannot+be+cancelled');
     exit;
 }
 
-// Fallback redirect
+// Fallback
 header('Location: order-history.php');
 exit;
 ?>

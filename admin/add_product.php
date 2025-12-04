@@ -2,7 +2,7 @@
 require_once '../db/conn.php';
 session_start();
 
-// Security Check: Ensure user is logged in and is an admin
+// Check Admin Access
 if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
     header("Location: ../login.php");
     exit;

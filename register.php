@@ -1,12 +1,12 @@
 ﻿<?php
-require_once 'db/conn.php'; // Include database connection
+require_once 'db/conn.php';
 if (session_status() === PHP_SESSION_NONE)
     session_start();
 
 $error = '';
 $success = '';
 
-// Handle Registration Form Submission
+// Handle Registration
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($password !== $confirm_password) {
         $error = 'Passwords do not match.';
     } else {
-        // Check if email already exists
+        // Check if email exists
         $check_sql = "SELECT id FROM users WHERE email = ?";
         $check_stmt = mysqli_prepare($conn, $check_sql);
         mysqli_stmt_bind_param($check_stmt, "s", $email);
@@ -29,10 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (mysqli_stmt_num_rows($check_stmt) > 0) {
             $error = 'Email is already registered.';
         } else {
-            // Hash the password for security
+            // Hash password
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            // Insert new user into database
+            // Insert user
             $sql = "INSERT INTO users (name, email, password, is_admin) VALUES (?, ?, ?, 0)";
             $stmt = mysqli_prepare($conn, $sql);
             mysqli_stmt_bind_param($stmt, "sss", $name, $email, $hashed_password);

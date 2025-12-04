@@ -2,7 +2,7 @@
 require_once '../db/conn.php';
 session_start();
 
-// Security Check: Ensure user is logged in and is an admin
+// Check Admin Access
 if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
     header("Location: ../login.php");
     exit;
@@ -21,10 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cat = $_POST['category'];
         $img = $_POST['image_url'];
 
-        // Use Prepared Statement to prevent SQL Injection
+        // Insert Product
         $sql = "INSERT INTO products (name, description, price, stock, category, image_url) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = mysqli_prepare($conn, $sql);
-        // Bind parameters: s=string, d=double(decimal), i=integer
         mysqli_stmt_bind_param($stmt, "ssdiss", $name, $desc, $price, $stock, $cat, $img);
 
         if (mysqli_stmt_execute($stmt)) {

@@ -1,20 +1,20 @@
 ﻿<?php
-require_once 'db/conn.php'; // Include database connection
+require_once 'db/conn.php';
 if (session_status() === PHP_SESSION_NONE)
-    session_start(); // Start session if not already started
+    session_start();
 
 $error = '';
 
-// Handle Login Form Submission
+// Handle Login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
 
-    // Basic validation
+    // Validation
     if (empty($email) || empty($password)) {
         $error = 'Please enter both email and password.';
     } else {
-        // SECURE: Use Prepared Statement to prevent SQL Injection
+        // Check user
         $sql = "SELECT * FROM users WHERE email = ?";
         $stmt = mysqli_prepare($conn, $sql);
         mysqli_stmt_bind_param($stmt, "s", $email);
@@ -23,9 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = mysqli_stmt_get_result($stmt);
         $user = mysqli_fetch_assoc($result);
 
-        // Verify password using password_verify() (checks hash)
+        // Verify password
         if ($user && password_verify($password, $user['password'])) {
-            // Set session variables
+            // Set session
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['is_admin'] = $user['is_admin'];

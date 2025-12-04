@@ -2,7 +2,7 @@
 require_once '../db/conn.php';
 session_start();
 
-// Security Check: Ensure user is logged in and is an admin
+// Check Admin Access
 if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
     header("Location: ../login.php");
     exit;
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $order_id = $_POST['order_id'];
         $status = $_POST['status'];
 
-        // Use Prepared Statement to update status
+        // Update status
         $sql = "UPDATE orders SET status = ? WHERE id = ?";
         $stmt = mysqli_prepare($conn, $sql);
         mysqli_stmt_bind_param($stmt, "si", $status, $order_id);

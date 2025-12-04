@@ -1,38 +1,35 @@
 ﻿<?php
-require_once 'db/conn.php'; // Include database connection
+require_once 'db/conn.php';
 $pageTitle = 'Product Details';
 include 'includes/header.php';
 include 'includes/navbar.php';
 
-// Check if 'id' is passed in the URL
+// Check if 'id' is passed
 if (!isset($_GET['id'])) {
-    // Redirect to products page if no ID is provided
     header("Location: products.php");
     exit;
 }
 
 $product_id = $_GET['id'];
 
-// --- FETCH PRODUCT DETAILS ---
-// We use prepared statements to prevent SQL injection, as the ID comes from the URL.
+// Fetch product details
 $sql = "SELECT * FROM products WHERE id = ?";
 $stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "i", $product_id); // 'i' means integer
+mysqli_stmt_bind_param($stmt, "i", $product_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $product = mysqli_fetch_assoc($result);
 
-// Check if product exists in the database
+// Check if product exists
 if (!$product) {
     echo "<div class='container my-5'><h2>Product not found</h2></div>";
     include 'includes/footer.php';
     exit;
 }
 
-// --- HANDLE REVIEW SUBMISSION ---
-// This block runs only when the form is submitted (POST request)
+// Handle review submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
-    // Ensure the user is logged in before allowing them to review
+    // Check login
     if (!isset($_SESSION['user_id'])) {
         $error = "You must be logged in to submit a review.";
     } else {
@@ -40,13 +37,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
         $rating = (int) $_POST['rating'];
         $comment = trim($_POST['comment']);
 
-        // Basic validation
+        // Validation
         if ($rating < 1 || $rating > 5) {
             $error = "Invalid rating.";
         } elseif (empty($comment)) {
             $error = "Comment cannot be empty.";
         } else {
-            // Insert the review into the database using prepared statements
+            // Insert review
             $stmt = mysqli_prepare($conn, "INSERT INTO reviews (product_id, user_id, rating, comment) VALUES (?, ?, ?, ?)");
             mysqli_stmt_bind_param($stmt, "iiis", $product_id, $user_id, $rating, $comment);
             if (mysqli_stmt_execute($stmt)) {
@@ -57,8 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
         }
     }
 }
-// --- FETCH REVIEWS ---
-// We join the 'reviews' table with the 'users' table to get the name of the reviewer.
+// Fetch reviews
 $reviews_sql = "SELECT r.*, u.name as user_name FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = ? ORDER BY r.created_at DESC";
 $stmt_reviews = mysqli_prepare($conn, $reviews_sql);
 mysqli_stmt_bind_param($stmt_reviews, "i", $product_id);

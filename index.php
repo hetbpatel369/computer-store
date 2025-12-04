@@ -1,8 +1,8 @@
 ﻿<?php
-require_once 'db/conn.php'; // Include database connection
+require_once 'db/conn.php';
 $pageTitle = 'Computer Store - Home';
-include 'includes/header.php'; // Include HTML header
-include 'includes/navbar.php'; // Include Navigation bar
+include 'includes/header.php';
+include 'includes/navbar.php';
 ?>
 
 <!-- Hero Section: Main visual area with video background -->
@@ -71,7 +71,7 @@ include 'includes/navbar.php'; // Include Navigation bar
                     echo '<p class="text-center">No products found.</p>';
                 }
             } else {
-                // Display error if query fails (useful for debugging)
+                // Display error
                 echo "Error: " . mysqli_error($conn);
             }
             ?>
@@ -95,4 +95,4 @@ include 'includes/navbar.php'; // Include Navigation bar
     </div>
 </section>
 
-<?php include 'includes/footer.php'; // Include Footer ?>
+<?php include 'includes/footer.php'; ?>

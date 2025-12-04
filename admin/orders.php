@@ -2,13 +2,13 @@
 require_once '../db/conn.php';
 session_start();
 
-// Security Check: Ensure user is logged in and is an admin
+// Check Admin Access
 if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
     header("Location: ../login.php");
     exit;
 }
 
-// Fetch All Orders with User Details
+// Fetch All Orders
 $sql = "SELECT o.*, u.name as user_name, u.email as user_email 
         FROM orders o 
         JOIN users u ON o.user_id = u.id 
@@ -60,7 +60,7 @@ include '../includes/admin_navbar.php';
                                         'completed' => 'bg-success',
                                         'delivered' => 'bg-info',
                                         'cancelled' => 'bg-danger',
-                                        'in-transit' => 'bg-primary', // Added in-transit
+                                        'in-transit' => 'bg-primary',
                                         default => 'bg-warning'
                                     };
                                     ?>

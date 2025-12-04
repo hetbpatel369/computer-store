@@ -39,19 +39,19 @@
       }
   };
 
-  // Apply theme immediately to avoid flash
+  // Apply theme immediately
   setTheme(getPreferredTheme());
 
   window.addEventListener('DOMContentLoaded', () => {
     const currentTheme = getPreferredTheme();
     updateIcons(currentTheme);
 
-    // Single Toggle Button (Public Site)
+    // Single Toggle Button
     const toggleBtn = document.querySelector('#darkModeToggle');
     if (toggleBtn) {
         toggleBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            // Determine current state based on storage or preference, not just DOM
+            // Determine current state
             const activeTheme = getStoredTheme() || getPreferredTheme();
             const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
             

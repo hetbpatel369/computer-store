@@ -2,13 +2,13 @@
 require_once '../db/conn.php';
 session_start();
 
-// Security Check: Ensure user is logged in and is an admin
+// Check Admin Access
 if (!isset($_SESSION['user_id']) || !$_SESSION['is_admin']) {
     header("Location: ../login.php");
     exit;
 }
 
-// Handle Product Deletion via GET request (for simplicity)
+// Handle Product Deletion
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $sql = "DELETE FROM products WHERE id = ?";
@@ -80,13 +80,13 @@ include '../includes/admin_navbar.php';
                                     </span>
                                 </td>
                                 <td>
-                                    <!-- Edit Button (Link to Page) -->
+                                    <!-- Edit Button -->
                                     <a href="edit_product.php?id=<?php echo $product['id']; ?>"
                                         class="btn btn-sm btn-outline-primary me-1">
                                         <i class="fas fa-edit"></i>
                                     </a>
 
-                                    <!-- Delete Button (Form) -->
+                                    <!-- Delete Button -->
                                     <form action="product_actions.php" method="POST" class="d-inline"
                                         onsubmit="return confirm('Delete this product?');">
                                         <input type="hidden" name="action" value="delete">

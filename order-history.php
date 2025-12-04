@@ -1,9 +1,9 @@
 ﻿<?php
-require_once 'db/conn.php'; // Include database connection
+require_once 'db/conn.php';
 if (session_status() === PHP_SESSION_NONE)
     session_start();
 
-// Ensure user is logged in
+// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -16,7 +16,7 @@ $message = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order_id'])) {
     $order_id = $_POST['cancel_order_id'];
 
-    // Verify order belongs to user and is pending
+    // Verify order
     $check_sql = "SELECT status FROM orders WHERE id = ? AND user_id = ?";
     $check_stmt = mysqli_prepare($conn, $check_sql);
     mysqli_stmt_bind_param($check_stmt, "ii", $order_id, $user_id);
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order_id'])) {
     $check_result = mysqli_stmt_get_result($check_stmt);
     $order_data = mysqli_fetch_assoc($check_result);
 
-    // Only allow cancellation if status is 'pending'
+    // Cancel if pending
     if ($order_data && $order_data['status'] == 'pending') {
         $update_sql = "UPDATE orders SET status = 'cancelled' WHERE id = ?";
         $update_stmt = mysqli_prepare($conn, $update_sql);
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order_id'])) {
     }
 }
 
-// Fetch Orders for the logged-in user
+// Fetch Orders
 $sql = "SELECT * FROM orders WHERE user_id = ? ORDER BY order_date DESC";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, "i", $user_id);
@@ -82,19 +82,19 @@ include 'includes/navbar.php';
                             <td>
                                 <?php
                                 $status = $order['status'] ?? 'pending';
-                                // Determine badge color based on status
+                                // Badge color
                                 $badgeClass = match ($status) {
-                                    'in-transit' => 'bg-primary', // Blue for in-transit
-                                    'delivered' => 'bg-success', // Green for delivered
-                                    'cancelled' => 'bg-danger', // Red for cancelled
-                                    default => 'bg-warning' // Yellow for pending/others
+                                    'in-transit' => 'bg-primary',
+                                    'delivered' => 'bg-success',
+                                    'cancelled' => 'bg-danger',
+                                    default => 'bg-warning'
                                 };
                                 ?>
                                 <span class="badge <?php echo $badgeClass; ?>"><?php echo ucfirst($status); ?></span>
                             </td>
                             <td>
                                 <?php if ($status == 'pending'): ?>
-                                    <!-- Cancel Button (Only for pending orders) -->
+                                    <!-- Cancel Button -->
                                     <form method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
                                         <input type="hidden" name="cancel_order_id" value="<?php echo $order['id']; ?>">
                                         <button type="submit" class="btn btn-sm btn-danger">Cancel Order</button>

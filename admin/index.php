@@ -1,7 +1,7 @@
 ﻿<?php
 require_once '../db/conn.php';
 
-// Start session if not already started
+// Start session
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['
     exit();
 }
 
-// --- Fetch Statistics (MySQLi) ---
+// --- Fetch Statistics ---
 // Total Sales
 $res = mysqli_query($conn, "SELECT SUM(total_price) as total FROM orders");
 $row = mysqli_fetch_assoc($res);

@@ -1,10 +1,10 @@
 ﻿<?php
-require_once 'db/conn.php'; // Include database connection
+require_once 'db/conn.php';
 $pageTitle = 'Checkout - Computer Store';
 include 'includes/header.php';
 include 'includes/navbar.php';
 
-// Ensure user is logged in
+// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     echo '<script>window.location.href = "login.php";</script>';
     exit;
@@ -14,7 +14,7 @@ $user_id = $_SESSION['user_id'];
 $cart_items = [];
 $total = 0;
 
-// Fetch cart items for the checkout summary
+// Fetch cart items
 $sql = "SELECT c.quantity, p.id as product_id, p.name, p.price, p.stock 
         FROM cart c 
         JOIN products p ON c.product_id = p.id 
@@ -41,24 +41,21 @@ if ($stmt) {
     $error = "Error loading cart.";
 }
 
-// Handle Order Placement (Form Submission)
+// Handle Order Placement
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Collect form data
     $shipping_name = $_POST['shipping_name'];
     $shipping_phone = $_POST['shipping_phone'];
     $shipping_address = $_POST['shipping_address'];
     $shipping_city = $_POST['shipping_city'];
     $shipping_zip = $_POST['shipping_zip'];
     $payment_method = $_POST['payment_method'];
-    $order_total = $total * 1.10; // Total with 10% tax
+    $order_total = $total * 1.10; // Total with tax
 
     // Start Transaction
-    // A transaction ensures that all database operations (create order, add items, update stock, clear cart)
-    // happen together. If one fails, everything is rolled back, preventing data inconsistency.
     mysqli_begin_transaction($conn);
 
     try {
-        // 1. Create Order Record
+        // Create Order
         $sql_order = "INSERT INTO orders (user_id, total_price, shipping_name, shipping_address, shipping_city, shipping_zip, shipping_phone, payment_method) 
                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt_order = mysqli_prepare($conn, $sql_order);
@@ -79,9 +76,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Error creating order: " . mysqli_error($conn));
         }
 
-        $order_id = mysqli_insert_id($conn); // Get the ID of the newly created order
+        $order_id = mysqli_insert_id($conn);
 
-        // 2. Create Order Items & Update Stock
+        // Create Order Items & Update Stock
         $sql_item = "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
         $stmt_item = mysqli_prepare($conn, $sql_item);
 
@@ -102,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // 3. Clear User's Cart
+        // Clear Cart
         $sql_clear = "DELETE FROM cart WHERE user_id = ?";
         $stmt_clear = mysqli_prepare($conn, $sql_clear);
         mysqli_stmt_bind_param($stmt_clear, "i", $user_id);
@@ -110,15 +107,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Error clearing cart: " . mysqli_error($conn));
         }
 
-        // Commit Transaction (Save changes)
+        // Commit Transaction
         mysqli_commit($conn);
 
-        // Redirect to Order History with success message
+        // Redirect to Order History
         echo '<script>window.location.href = "order-history.php?success=1";</script>';
         exit;
 
     } catch (Exception $e) {
-        // Rollback Transaction (Undo changes if error occurred)
+        // Rollback Transaction
         mysqli_rollback($conn);
         $error = "Order failed: " . $e->getMessage();
     }

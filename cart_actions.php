@@ -2,7 +2,7 @@
 session_start();
 require_once 'db/conn.php';
 
-// 1. Security Check: Ensure user is logged in [cite: 161-163]
+// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -12,13 +12,13 @@ $user_id = $_SESSION['user_id'];
 $action = $_POST['action'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
-    // --- ADD ITEM TO CART ---
+
+    // Add item to cart
     if ($action === 'add') {
         $product_id = $_POST['product_id'];
-        $quantity = (int)$_POST['quantity'];
+        $quantity = (int) $_POST['quantity'];
 
-        // A. Check Product Stock
+        // Check stock
         $sql_stock = "SELECT stock FROM products WHERE id = ?";
         $stmt = mysqli_prepare($conn, $sql_stock);
         mysqli_stmt_bind_param($stmt, "i", $product_id);
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $product = mysqli_fetch_assoc($res_stock);
 
         if ($product && $product['stock'] >= $quantity) {
-            // B. Check if item already exists in cart
+            // Check if item exists in cart
             $sql_check = "SELECT id, quantity FROM cart WHERE user_id = ? AND product_id = ?";
             $stmt_check = mysqli_prepare($conn, $sql_check);
             mysqli_stmt_bind_param($stmt_check, "ii", $user_id, $product_id);
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $existing_item = mysqli_fetch_assoc($res_check);
 
             if ($existing_item) {
-                // Update quantity if exists
+                // Update quantity
                 $new_quantity = $existing_item['quantity'] + $quantity;
                 if ($new_quantity <= $product['stock']) {
                     $sql_update = "UPDATE cart SET quantity = ? WHERE id = ?";
@@ -52,12 +52,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 mysqli_stmt_execute($stmt_insert);
             }
         }
-    } 
-    
-    // --- UPDATE QUANTITY ---
+    }
+
+    // Update quantity
     elseif ($action === 'update') {
         $cart_id = $_POST['cart_id'];
-        $quantity = (int)$_POST['quantity'];
+        $quantity = (int) $_POST['quantity'];
 
         if ($quantity > 0) {
             $sql = "UPDATE cart SET quantity = ? WHERE id = ? AND user_id = ?";
@@ -65,15 +65,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mysqli_stmt_bind_param($stmt, "iii", $quantity, $cart_id, $user_id);
             mysqli_stmt_execute($stmt);
         } else {
-            // Remove if quantity is 0
+            // Remove item
             $sql = "DELETE FROM cart WHERE id = ? AND user_id = ?";
             $stmt = mysqli_prepare($conn, $sql);
             mysqli_stmt_bind_param($stmt, "ii", $cart_id, $user_id);
             mysqli_stmt_execute($stmt);
         }
-    } 
-    
-    // --- REMOVE ITEM ---
+    }
+
+    // Remove item
     elseif ($action === 'remove') {
         $cart_id = $_POST['cart_id'];
         $sql = "DELETE FROM cart WHERE id = ? AND user_id = ?";
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Redirect back to the previous page or cart
+// Redirect back
 if (isset($_SERVER['HTTP_REFERER'])) {
     header("Location: " . $_SERVER['HTTP_REFERER']);
 } else {

@@ -1,19 +1,18 @@
 ﻿<?php
-require_once 'db/conn.php'; // Include database connection
+require_once 'db/conn.php';
 $pageTitle = 'Shopping Cart';
 include 'includes/header.php';
 include 'includes/navbar.php';
 
-// Initialize cart items array and total
+// Initialize cart
 $cart_items = [];
 $total = 0;
 
-// Check if user is logged in
+// Check if logged in
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
 
-    // Fetch cart items from database for the logged-in user
-    // We join 'cart' table with 'products' table to get product details (name, price, image)
+    // Get cart items
     $sql = "SELECT c.id as cart_id, c.quantity, p.id as product_id, p.name, p.price, p.image_url, p.stock 
             FROM cart c 
             JOIN products p ON c.product_id = p.id 
@@ -24,11 +23,10 @@ if (isset($_SESSION['user_id'])) {
     $result = mysqli_stmt_get_result($stmt);
     $cart_items = mysqli_fetch_all($result, MYSQLI_ASSOC);
 } else {
-    // If not logged in, show a message or redirect (optional)
-    // For now, we just keep the cart empty
+    // User not logged in
 }
 
-// Calculate total price
+// Calculate total
 foreach ($cart_items as $item) {
     $total += $item['price'] * $item['quantity'];
 }

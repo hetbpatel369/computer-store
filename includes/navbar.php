@@ -1,5 +1,5 @@
 <?php
-// Ensure session is started to check login status
+// Start session if needed
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -8,19 +8,19 @@ if (session_status() === PHP_SESSION_NONE) {
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
         <div class="container-fluid position-relative">
-            <!-- Brand Logo (Left) -->
+            <!-- Brand Logo -->
             <a class="navbar-brand fw-bold text-uppercase" href="index.php" style="padding: 0 10px;">
                 <i class="fas fa-laptop-code me-2"></i>Next Gen Tech
             </a>
 
-            <!-- Mobile Toggle Button -->
+            <!-- Mobile Toggle -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <!-- Navbar Links -->
             <div class="collapse navbar-collapse" id="navbarNav">
-                <!-- Centered Links (Home, Products) -->
+                <!-- Centered Links -->
                 <ul class="navbar-nav centered-nav">
                     <li class="nav-item">
                         <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>"
@@ -32,7 +32,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     </li>
                 </ul>
 
-                <!-- Right Side: User Menu & Cart -->
+                <!-- Right Side: User & Cart -->
                 <ul class="navbar-nav ms-auto align-items-center" style="padding: 0 10px;">
                     <!-- Cart Icon -->
                     <li class="nav-item me-3">
@@ -41,7 +41,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </a>
                     </li>
 
-                    <!-- User Dropdown / Login Links -->
+                    <!-- User Menu -->
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
