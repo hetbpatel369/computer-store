@@ -76,3 +76,17 @@ Next Gen Tech is a web-based e-commerce application designed for selling high-pe
 
 - **Email:** `user@example.com`
 - **Password:** `password`
+
+## Student Information
+
+This is a group project for the COSC 2956 course at Algoma University.
+Members:
+
+- **Name:** Zenil Babaria
+- **Student ID:** 5147477
+
+- **Name:** Het Birenkumar Patel
+- **Student ID:** 5146724
+
+- **Name:** Pranjal Patel
+- **Student ID:** ???
